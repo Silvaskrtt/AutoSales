@@ -1,0 +1,39 @@
+2026-02-09 18:53:48.932 -03 [21020] LOG:  iniciando PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35221, 64-bit
+2026-02-09 18:53:48.936 -03 [21020] LOG:  escutando no endereço IPv6 "::1", porta 5432
+2026-02-09 18:53:48.936 -03 [21020] LOG:  escutando no endereço IPv4 "127.0.0.1", porta 5432
+2026-02-09 18:53:49.066 -03 [21656] LOG:  sistema de banco de dados foi interrompido; última execução em 2026-02-02 20:18:05 -03
+2026-02-09 18:53:54.346 -03 [21656] LOG:  sistema de banco de dados não foi desligado corretamente; recuperação automática está em andamento
+2026-02-09 18:53:54.350 -03 [21656] LOG:  redo inicia em 0/242DE30
+2026-02-09 18:53:54.350 -03 [21656] LOG:  comprimento de registro inválido em 0/242DF70: esperado pelo menos 24, obtido 0
+2026-02-09 18:53:54.350 -03 [21656] LOG:  refazer feito em 0/242DF38 uso do sistema: CPU: usuário: 0.00 s, sistema: 0.00 s, decorrido: 0.00 s
+2026-02-09 18:53:54.376 -03 [21100] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-02-09 18:53:54.406 -03 [21100] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.004 s, total=0.049 s; sync files=3, longest=0.002 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/242DF70, redo lsn=0/242DF70
+2026-02-09 18:53:54.440 -03 [21020] LOG:  sistema de banco de dados está pronto para aceitar conexões
+2026-02-09 18:54:01.020 -03 [13500] FATAL:  autenticação do tipo senha falhou para o usuário "postgres"
+2026-02-09 18:54:01.020 -03 [13500] DETALHE:  A conexão correspondeu ao arquivo "C:/pgsql/pgdata/pg_hba.conf" linha 117: "host    all             all             ::1/128                 scram-sha-256"
+2026-02-09 18:54:01.162 -03 [17860] FATAL:  autenticação do tipo senha falhou para o usuário "postgres"
+2026-02-09 18:54:01.162 -03 [17860] DETALHE:  A conexão correspondeu ao arquivo "C:/pgsql/pgdata/pg_hba.conf" linha 115: "host    all             all             127.0.0.1/32            scram-sha-256"
+2026-02-09 18:54:16.946 -03 [11384] FATAL:  autenticação do tipo senha falhou para o usuário "postgres"
+2026-02-09 18:54:16.946 -03 [11384] DETALHE:  A conexão correspondeu ao arquivo "C:/pgsql/pgdata/pg_hba.conf" linha 117: "host    all             all             ::1/128                 scram-sha-256"
+2026-02-09 18:54:17.093 -03 [18484] FATAL:  autenticação do tipo senha falhou para o usuário "postgres"
+2026-02-09 18:54:17.093 -03 [18484] DETALHE:  A conexão correspondeu ao arquivo "C:/pgsql/pgdata/pg_hba.conf" linha 115: "host    all             all             127.0.0.1/32            scram-sha-256"
+2026-02-09 18:58:54.412 -03 [21100] LOG:  checkpoint starting: time
+2026-02-09 18:58:54.723 -03 [21100] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.219 s, sync=0.037 s, total=0.312 s; sync files=1, longest=0.037 s, average=0.037 s; distance=16 kB, estimate=16 kB; lsn=0/2432150, redo lsn=0/24320F8
+2026-02-09 19:29:01.545 -03 [21020] LOG:  client backend (PID 18964) foi terminado pela exceção 0xC000013A
+2026-02-09 19:29:01.545 -03 [21020] DETALHE:  Processo que falhou estava executando: /*pga4dash*/
+	SELECT 'session_stats' AS chart_name, pg_catalog.row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT count(*) FROM pg_catalog.pg_stat_activity WHERE datname = (SELECT datname FROM pg_catalog.pg_database WHERE oid = 24576)) AS "Total",
+	   (SELECT count(*) FROM pg_catalog.pg_stat_activity WHERE state = 'active' AND datname = (SELECT datname FROM pg_catalog.pg_database WHERE oid = 24576))  AS "Active",
+	   (SELECT count(*) FROM pg_catalog.pg_stat_activity WHERE state = 'idle' AND datname = (SELECT datname FROM pg_catalog.pg_database WHERE oid = 24576))  AS "Idle"
+	) t
+	UNION ALL
+	SELECT 'tps_stats' AS chart_name, pg_catalog.row_to_json(t) AS chart_data
+	FROM (SELECT
+	   (SELECT sum(xact_commit) + sum(xact_rollback) FROM pg_catalog.pg_stat_database WHERE datname = (SELECT datname FROM pg_catalog.pg_database WHERE oid = 24576)) AS "Transactions",
+	   (SELECT sum(xact_commit) FROM pg_catalog.pg_stat_database WHERE datname = (SELECT datname FROM pg_catalog.pg_database WHERE oid = 24576)) AS "Commits",
+	   (SE
+2026-02-09 19:29:01.545 -03 [21020] DICA:  Veja o arquivo de cabeçalho C "ntstatus.h" para obter uma descrição do valor hexadecimal.
+2026-02-09 19:29:01.546 -03 [21020] LOG:  terminando quaisquer outros processos servidor ativos
+2026-02-09 19:29:01.559 -03 [21020] LOG:  pedido de desligamento rápido foi recebido
+^C
