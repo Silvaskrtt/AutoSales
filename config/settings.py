@@ -30,10 +30,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
+    # Apps padrão do Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # django-allauth
-    'django.contrib.sites',
+    'django.contrib.sites', # Necessário para o django-allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -55,8 +55,16 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+# URL para usuários não autenticados
+LOGIN_URL = '/accounts/login/'
+
+# =====================================================
+# Configuração do django-allauth
+# =====================================================
+
+# URLs de redirecionamento após login/logout
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 ACCOUNT_EMAIL_VERIFICATION = 'none' # Ou 'optional'/'mandatory'
 
 MIDDLEWARE = [

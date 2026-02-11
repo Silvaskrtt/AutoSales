@@ -95,4 +95,60 @@
 	   (SE
 2026-02-09 21:02:50.637 -03 [14480] DICA:  Veja o arquivo de cabeçalho C "ntstatus.h" para obter uma descrição do valor hexadecimal.
 2026-02-09 21:02:50.637 -03 [14480] LOG:  terminando quaisquer outros processos servidor ativos
+^C2026-02-10 18:46:02.175 -03 [9616] LOG:  iniciando PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35221, 64-bit
+2026-02-10 18:46:02.180 -03 [9616] LOG:  escutando no endereço IPv6 "::1", porta 5432
+2026-02-10 18:46:02.180 -03 [9616] LOG:  escutando no endereço IPv4 "127.0.0.1", porta 5432
+2026-02-10 18:46:02.303 -03 [5968] LOG:  sistema de banco de dados foi interrompido; última execução em 2026-02-09 21:01:15 -03
+2026-02-10 18:46:06.485 -03 [5968] LOG:  sistema de banco de dados não foi desligado corretamente; recuperação automática está em andamento
+2026-02-10 18:46:06.489 -03 [5968] LOG:  redo inicia em 0/2432278
+2026-02-10 18:46:06.489 -03 [5968] LOG:  comprimento de registro inválido em 0/24322B0: esperado pelo menos 24, obtido 0
+2026-02-10 18:46:06.489 -03 [5968] LOG:  refazer feito em 0/2432278 uso do sistema: CPU: usuário: 0.00 s, sistema: 0.00 s, decorrido: 0.00 s
+2026-02-10 18:46:06.512 -03 [3832] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-02-10 18:46:06.537 -03 [3832] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.004 s, total=0.042 s; sync files=3, longest=0.002 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/24322B0, redo lsn=0/24322B0
+2026-02-10 18:46:06.562 -03 [9616] LOG:  sistema de banco de dados está pronto para aceitar conexões
+2026-02-10 20:51:06.682 -03 [3832] LOG:  checkpoint starting: time
+2026-02-10 20:51:08.952 -03 [9616] LOG:  client backend (PID 9520) foi terminado pela exceção 0xC000013A
+2026-02-10 20:51:08.952 -03 [9616] DETALHE:  Processo que falhou estava executando: SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"
+2026-02-10 20:51:08.952 -03 [9616] DICA:  Veja o arquivo de cabeçalho C "ntstatus.h" para obter uma descrição do valor hexadecimal.
+2026-02-10 20:51:08.952 -03 [9616] LOG:  terminando quaisquer outros processos servidor ativos
+2026-02-10 20:51:08.968 -03 [9616] LOG:  pedido de desligamento rápido foi recebido
+^C2026-02-11 18:51:47.236 -03 [15840] LOG:  iniciando PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35221, 64-bit
+2026-02-11 18:51:47.242 -03 [15840] LOG:  escutando no endereço IPv6 "::1", porta 5432
+2026-02-11 18:51:47.242 -03 [15840] LOG:  escutando no endereço IPv4 "127.0.0.1", porta 5432
+2026-02-11 18:51:47.407 -03 [12896] LOG:  sistema de banco de dados foi interrompido; última execução em 2026-02-10 18:46:06 -03
+2026-02-11 18:51:57.417 -03 [12896] LOG:  syncing data directory (fsync), elapsed time: 10.00 s, current path: ./base/5/2836_vm
+2026-02-11 18:51:58.415 -03 [12896] LOG:  sistema de banco de dados não foi desligado corretamente; recuperação automática está em andamento
+2026-02-11 18:51:58.427 -03 [12896] LOG:  redo inicia em 0/2432328
+2026-02-11 18:51:58.560 -03 [12896] LOG:  comprimento de registro inválido em 0/24CC848: esperado pelo menos 24, obtido 0
+2026-02-11 18:51:58.560 -03 [12896] LOG:  refazer feito em 0/24CC810 uso do sistema: CPU: usuário: 0.03 s, sistema: 0.07 s, decorrido: 0.13 s
+2026-02-11 18:51:58.576 -03 [9264] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-02-11 18:51:58.753 -03 [9264] LOG:  checkpoint complete: wrote 135 buffers (0.8%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.082 s, sync=0.084 s, total=0.182 s; sync files=102, longest=0.002 s, average=0.001 s; distance=617 kB, estimate=617 kB; lsn=0/24CC848, redo lsn=0/24CC848
+2026-02-11 18:51:58.801 -03 [15840] LOG:  sistema de banco de dados está pronto para aceitar conexões
+2026-02-11 18:56:58.789 -03 [9264] LOG:  checkpoint starting: time
+2026-02-11 18:56:59.771 -03 [9264] LOG:  checkpoint complete: wrote 8 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.859 s, sync=0.039 s, total=0.982 s; sync files=3, longest=0.038 s, average=0.013 s; distance=52 kB, estimate=560 kB; lsn=0/24D9A60, redo lsn=0/24D9A08
+2026-02-11 19:21:58.806 -03 [9264] LOG:  checkpoint starting: time
+2026-02-11 19:22:00.404 -03 [9264] LOG:  checkpoint complete: wrote 14 buffers (0.1%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.495 s, sync=0.044 s, total=1.598 s; sync files=8, longest=0.037 s, average=0.006 s; distance=73 kB, estimate=512 kB; lsn=0/24EBF10, redo lsn=0/24EBEB8
+2026-02-11 19:32:41.688 -03 [15840] LOG:  client backend (PID 19152) foi terminado pela exceção 0xC000013A
+2026-02-11 19:32:41.688 -03 [15840] DETALHE:  Processo que falhou estava executando: SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"
+2026-02-11 19:32:41.688 -03 [15840] DICA:  Veja o arquivo de cabeçalho C "ntstatus.h" para obter uma descrição do valor hexadecimal.
+2026-02-11 19:32:41.688 -03 [15840] LOG:  terminando quaisquer outros processos servidor ativos
+2026-02-11 19:32:41.704 -03 [15840] LOG:  pedido de desligamento rápido foi recebido
+^C2026-02-11 19:33:19.372 -03 [11828] LOG:  iniciando PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35221, 64-bit
+2026-02-11 19:33:19.377 -03 [11828] LOG:  escutando no endereço IPv6 "::1", porta 5432
+2026-02-11 19:33:19.377 -03 [11828] LOG:  escutando no endereço IPv4 "127.0.0.1", porta 5432
+2026-02-11 19:33:19.492 -03 [13760] LOG:  sistema de banco de dados foi interrompido; última execução em 2026-02-11 19:22:00 -03
+2026-02-11 19:33:28.833 -03 [13760] LOG:  sistema de banco de dados não foi desligado corretamente; recuperação automática está em andamento
+2026-02-11 19:33:28.837 -03 [13760] LOG:  redo inicia em 0/24EBEB8
+2026-02-11 19:33:28.837 -03 [13760] LOG:  comprimento de registro inválido em 0/24EBFC0: esperado pelo menos 24, obtido 0
+2026-02-11 19:33:28.837 -03 [13760] LOG:  refazer feito em 0/24EBF88 uso do sistema: CPU: usuário: 0.00 s, sistema: 0.00 s, decorrido: 0.00 s
+2026-02-11 19:33:28.860 -03 [17908] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-02-11 19:33:28.888 -03 [17908] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.004 s, total=0.046 s; sync files=3, longest=0.002 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/24EBFC0, redo lsn=0/24EBFC0
+2026-02-11 19:33:28.921 -03 [11828] LOG:  sistema de banco de dados está pronto para aceitar conexões
+2026-02-11 19:38:28.894 -03 [17908] LOG:  checkpoint starting: time
+2026-02-11 19:38:33.425 -03 [17908] LOG:  checkpoint complete: wrote 41 buffers (0.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=4.382 s, sync=0.094 s, total=4.531 s; sync files=26, longest=0.039 s, average=0.004 s; distance=81 kB, estimate=81 kB; lsn=0/2500700, redo lsn=0/25006A8
+2026-02-11 19:38:48.910 -03 [11828] LOG:  client backend (PID 13360) foi terminado pela exceção 0xC000013A
+2026-02-11 19:38:48.910 -03 [11828] DETALHE:  Processo que falhou estava executando: SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"
+2026-02-11 19:38:48.910 -03 [11828] DICA:  Veja o arquivo de cabeçalho C "ntstatus.h" para obter uma descrição do valor hexadecimal.
+2026-02-11 19:38:48.910 -03 [11828] LOG:  terminando quaisquer outros processos servidor ativos
+2026-02-11 19:38:48.920 -03 [11828] LOG:  pedido de desligamento rápido foi recebido
 ^C

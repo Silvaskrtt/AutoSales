@@ -18,8 +18,9 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    # Admin
     path('admin/', admin.site.urls),
 
-    # django-allauth
-    path('accounts/', include('allauth.urls')),
+    # Autenticação (django-allauth)
+    path('accounts/', include('allauth.urls')), # Login, logout, signup, etc.
 ]
