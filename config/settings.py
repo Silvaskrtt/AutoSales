@@ -11,11 +11,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Adiciona a pasta apps ao path do Python
+sys.path.append(str(BASE_DIR / 'apps'))
 
 load_dotenv(BASE_DIR / '.env')
 
@@ -42,13 +46,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # django-allauth
+    'accounts',
     'django.contrib.sites', # Necessário para o django-allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
 ]
 
-SITE_ID = 1
+AUTH_USER_MODEL = 'accounts.User'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -62,10 +67,37 @@ LOGIN_URL = '/accounts/login/'
 # Configuração do django-allauth
 # =====================================================
 
+# ID do site (obrigatório para o allauth)0
+SITE_ID = 1
+
+ACCOUNT_FORMS = {
+    'add_email': 'allauth.account.forms.AddEmailForm',
+    'change_password': 'allauth.account.forms.ChangePasswordForm',
+    'confirm_login_code': 'allauth.account.forms.ConfirmLoginCodeForm',
+    'login': 'allauth.account.forms.LoginForm',
+    'request_login_code': 'allauth.account.forms.RequestLoginCodeForm',
+    'reset_password': 'allauth.account.forms.ResetPasswordForm',
+    'reset_password_from_key': 'allauth.account.forms.ResetPasswordKeyForm',
+    'set_password': 'allauth.account.forms.SetPasswordForm',
+    'signup': 'allauth.account.forms.SignupForm',
+    'user_token': 'allauth.account.forms.UserTokenForm',
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Métodos de autenticação permitidos
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
+
+# Campos obrigatórios no cadastro
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+
+# Criptografia para proteger link de confirmação do email
+ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
+
 # URLs de redirecionamento após login/logout
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
-ACCOUNT_EMAIL_VERIFICATION = 'none' # Ou 'optional'/'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
