@@ -10,7 +10,10 @@ class Cliente(models.Model):
     email = models.EmailField(
         db_index=True,
         max_length=app_settings.EMAIL_MAX_LENGTH,
-        verbose_name=_("email address"),
+        verbose_name=_("Endereço de Email"),
     )
-    endereco_completo = models.TextField(help_text="Insira o endereço completo")
+    endereco_completo = models.TextField(
+        help_text="Insira o endereço completo",
+        verbose_name=_("Endereço Completo"),
+    )
     data_cadastro = models.DateTimeField(_("data de cadastro"), auto_now_add=True)

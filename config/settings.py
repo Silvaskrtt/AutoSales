@@ -44,7 +44,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    
+    # Apps do sistema
+    'auditoria',
+    'clientes',
+    'marcas',
+    'modelos',
+    'pagamentos',
+    'relatorios',
+    'veiculos',
+    'vendas',
+    
     # django-allauth
     'accounts',
     'django.contrib.sites', # Necessário para o django-allauth
