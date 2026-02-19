@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class Cliente(models.Model):
     
     nome = models.CharField(max_length=150)
+    sobrenome = models.CharField(max_length=150)
     cpf = models.CharField(max_length=14, unique=True) # 11 números + 3 de pontuação
     telefone = models.CharField(max_length=20)
     email = models.EmailField(
@@ -12,10 +13,11 @@ class Cliente(models.Model):
         max_length=app_settings.EMAIL_MAX_LENGTH,
         verbose_name=_("Endereço de Email"),
     )
-    endereco_completo = models.TextField(
-        help_text="Insira o endereço completo",
-        verbose_name=_("Endereço Completo"),
-    )
+    rua = models.CharField(max_length=255)
+    numero = models.CharField(max_length=10)
+    bairro = models.CharField(max_length=100)
+    cidade = models.CharField(max_length=100)
+    estado = models.CharField(max_length=100)
     data_cadastro = models.DateTimeField(_("data de cadastro"), auto_now_add=True)
 
     def __str__(self):
