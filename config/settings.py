@@ -48,9 +48,11 @@ INSTALLED_APPS = [
     # Apps do sistema
     'auditoria',
     'clientes',
+    'financiamentos',
     'marcas',
     'modelos',
     'pagamentos',
+    'parcelas',
     'relatorios',
     'veiculos',
     'vendas',
