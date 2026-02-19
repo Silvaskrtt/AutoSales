@@ -17,3 +17,6 @@ class Cliente(models.Model):
         verbose_name=_("Endereço Completo"),
     )
     data_cadastro = models.DateTimeField(_("data de cadastro"), auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.nome} - {self.cpf}"

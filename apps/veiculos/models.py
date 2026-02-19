@@ -40,7 +40,15 @@ class Veiculo(models.Model):
     )
     
     cor = models.CharField(max_length=50)
-    preco = models.DecimalField(max_digits=6, decimal_places=2)
+    
+    preco = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        verbose_name="Preço",
+        help_text="Preço do veículo em reais (ex.: 50000.00)"
+    )
+    
     status = models.CharField(
         max_length=20,
         choices=TYPE_CHOICES,
@@ -48,3 +56,6 @@ class Veiculo(models.Model):
     )
     
     modelo = models.ForeignKey(Modelo, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"{self.modelo} - {self.placa} - {self.status}"
