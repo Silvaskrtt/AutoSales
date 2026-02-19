@@ -16,6 +16,29 @@ class Venda(models.Model):
         verbose_name="Valor Total",
     )
     
+    entrada = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        verbose_name="Entrada",
+    )
+    
+    saldo_devedor = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        verbose_name="Saldo Devedor",
+    )
+    
+    tipo_pagamento = models.CharField(
+        max_length=20,
+        choices=[
+            ('avista', 'À Vista'),
+            ('parcelado', 'Parcelado'),
+        ],
+        verbose_name="Tipo de Pagamento",
+    )
+    
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE) # Vendedor responsável pela venda
     veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE)
