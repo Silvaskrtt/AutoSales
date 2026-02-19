@@ -13,6 +13,7 @@ class Veiculo(models.Model):
         ('DISPONIVEL', 'Disponível'),
         ('VENDIDO', 'Vendido'),
         ('RESERVADO', 'Reservado'),
+        ('MANUTENCAO', 'Manutenção'),
     ]
     
     # Validador para aceitar:
