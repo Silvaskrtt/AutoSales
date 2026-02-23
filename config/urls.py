@@ -23,4 +23,7 @@ urlpatterns = [
 
     # Autenticação (django-allauth)
     path('accounts/', include('allauth.urls')), # Login, logout, signup, etc.
+    
+    
+    path('', include('clientes.urls'))
 ]

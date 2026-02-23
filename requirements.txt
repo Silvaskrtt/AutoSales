@@ -17,6 +17,7 @@ psycopg2-binary>=2.9
 # Frontend
 # ============================
 django-bootstrap5>=23.3
+django-colorfield>=0.14.0
 
 # ============================
 # Environment Variables
