@@ -1,10 +1,27 @@
 <h1>Clientes</h1>
 
 <ul>
-    {% for cliente in clientes %}
-        <li>{{ cliente.nome }}</li>
-        <li>{{ cliente.sobrenome }}</li>
-    {% empty %}
-        <li>Nenhum cliente cadastrado</li>
-    {% endfor %}
+{% for cliente in clientes %}
+    <li>
+        {{ cliente.nome }} {{ cliente.sobrenome }} |
+        {{ cliente.email }} |
+        {{ cliente.telefone }}
+
+        <a href="{% url 'editar_cliente' cliente.pk %}">Editar</a>
+
+        <form action="{% url 'desativar_cliente' cliente.pk %}"
+              method="post"
+              style="display:inline;">
+
+            {% csrf_token %}
+
+            <button type="submit"
+                    onclick="return confirm('Deseja desativar?')">
+                Desativar
+            </button>
+        </form>
+    </li>
+{% empty %}
+    <li>Nenhum cliente cadastrado</li>
+{% endfor %}
 </ul>
