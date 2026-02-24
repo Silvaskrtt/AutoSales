@@ -1,27 +1,442 @@
-<h1>Clientes</h1>
+{% load static %}
 
-<ul>
-{% for cliente in clientes %}
-    <li>
-        {{ cliente.nome }} {{ cliente.sobrenome }} |
-        {{ cliente.email }} |
-        {{ cliente.telefone }}
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Clientes - Concessionária</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body class="bg-secondary">
+    <div class="container">
+        <!-- Cabeçalho -->
+        <header class="header">
+            <div class="header-content">
+                <div class="flex items-center gap-3">
+                    <div class="logo">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 17h2l.64-2.54c.24-.96.36-1.94.36-2.93V10h-2M5 17H3v-4.5A2.5 2.5 0 0 1 5.5 10H6M19 17h-2M5 17h2"/>
+                            <circle cx="7.5" cy="17" r="2.5"/>
+                            <circle cx="16.5" cy="17" r="2.5"/>
+                            <path d="M6 10V5h12v5"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gradient">Gerenciar Clientes</h1>
+                        <p class="text-sm text-tertiary">Sistema de Vendas de Carros</p>
+                    </div>
+                </div>
+                <button class="theme-toggle" id="btn-tema">
+                    <span class="theme-toggle-light">☀️</span>
+                    <span class="theme-toggle-dark" style="display: none;">🌙</span>
+                </button>
+            </div>
+        </header>
 
-        <a href="{% url 'editar_cliente' cliente.pk %}">Editar</a>
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <!-- Cards de Estatísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon stat-icon-primary">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total de Clientes</p>
+                        <p class="stat-value" id="total-clientes">0</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon stat-icon-success">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 6v6l4 2"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Ativos este Mês</p>
+                        <p class="stat-value" id="ativos-mes">0</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon stat-icon-warning">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Cidades Atendidas</p>
+                        <p class="stat-value" id="cidades-atendidas">0</p>
+                    </div>
+                </div>
+            </div>
 
-        <form action="{% url 'desativar_cliente' cliente.pk %}"
-              method="post"
-              style="display:inline;">
+            <!-- Barra de Busca e Ações -->
+            <div class="flex-between mb-6">
+                <div class="search-wrapper">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <input type="text" 
+                           class="search-input" 
+                           placeholder="Buscar por nome, CPF, e-mail ou cidade..."
+                           id="busca-cliente">
+                </div>
+                <button class="btn btn-primary" id="btn-novo-cliente">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    <span>Novo Cliente</span>
+                </button>
+            </div>
 
-            {% csrf_token %}
+            <!-- Tabela de Clientes -->
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Telefone</th>
+                            <th>E-mail</th>
+                            <th>Cidade</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-corpo">
+                        <!-- Linhas serão inseridas via JavaScript -->
+                    </tbody>
+                </table>
 
-            <button type="submit"
-                    onclick="return confirm('Deseja desativar?')">
-                Desativar
-            </button>
-        </form>
-    </li>
-{% empty %}
-    <li>Nenhum cliente cadastrado</li>
-{% endfor %}
-</ul>
+                <!-- Estado Vazio (quando não há clientes) -->
+                <div class="empty-state" id="estado-vazio" style="display: none;">
+                    <div class="empty-state-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <h3 class="empty-state-title">Nenhum cliente cadastrado</h3>
+                    <p class="empty-state-text">Comece cadastrando seu primeiro cliente</p>
+                    <button class="btn btn-primary" id="btn-primeiro-cliente">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Adicionar Cliente
+                    </button>
+                </div>
+
+                <!-- Paginação -->
+                <div class="pagination flex-between p-4" id="paginacao">
+                    <p class="text-sm text-tertiary" id="paginacao-info">Mostrando 0 de 0 clientes</p>
+                    <div class="pagination">
+                        <button class="pagination-arrow" id="pagina-anterior" disabled>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 18l-6-6 6-6"/>
+                            </svg>
+                        </button>
+                        <div class="pagination" id="paginacao-numeros"></div>
+                        <button class="pagination-arrow" id="proxima-pagina" disabled>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aviso de Limite -->
+            <div class="feedback-message feedback-error" id="aviso-limite" style="display: none;">
+                <div class="flex items-center gap-2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 8v4M12 16h.01"/>
+                    </svg>
+                    <p>Limite máximo de 999 clientes atingido. Exclua alguns clientes para adicionar novos.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Modal de Cliente (Adicionar/Editar) -->
+        <div class="modal-overlay" id="modal-cliente" style="display: none;">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modal-titulo">Adicionar Novo Cliente</h2>
+                    <button class="modal-close" id="fechar-modal">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <form id="form-cliente">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label" for="nome">Nome Completo</label>
+                                <input type="text" 
+                                       class="input-field" 
+                                       id="nome" 
+                                       name="nome" 
+                                       required 
+                                       maxlength="100"
+                                       placeholder="Digite o nome completo">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="cpf">CPF</label>
+                                <input type="text" 
+                                       class="input-field" 
+                                       id="cpf" 
+                                       name="cpf" 
+                                       required 
+                                       placeholder="000.000.000-00" 
+                                       maxlength="14"
+                                       pattern="\d{3}\.\d{3}\.\d{3}-\d{2}"
+                                       title="Digite um CPF válido no formato: 000.000.000-00">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="telefone">Telefone</label>
+                                <input type="text" 
+                                       class="input-field" 
+                                       id="telefone" 
+                                       name="telefone" 
+                                       required 
+                                       placeholder="(00) 00000-0000" 
+                                       maxlength="15"
+                                       pattern="\(\d{2}\) \d{5}-\d{4}"
+                                       title="Digite um telefone válido no formato: (00) 00000-0000">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="email">E-mail</label>
+                                <input type="email" 
+                                       class="input-field" 
+                                       id="email" 
+                                       name="email" 
+                                       required 
+                                       maxlength="100"
+                                       placeholder="exemplo@email.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="cidade">Cidade</label>
+                                <input type="text" 
+                                       class="input-field" 
+                                       id="cidade" 
+                                       name="cidade" 
+                                       required 
+                                       maxlength="50"
+                                       placeholder="Digite a cidade">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="observacoes">Observações (opcional)</label>
+                                <textarea id="observacoes" 
+                                          class="input-field" 
+                                          name="observacoes" 
+                                          rows="2"
+                                          maxlength="200"
+                                          placeholder="Informações adicionais..."></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelar-form">
+                        Cancelar
+                    </button>
+                    <button type="submit" form="form-cliente" class="btn btn-primary" id="salvar-cliente">
+                        <span class="btn-texto">Adicionar Cliente</span>
+                        <span class="btn-loading" style="display: none;">
+                            <svg class="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" fill="none"/>
+                                <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" fill="none"/>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmação de Exclusão -->
+        <div class="modal-overlay" id="modal-exclusao" style="display: none;">
+            <div class="modal modal-sm">
+                <div class="modal-body text-center">
+                    <div class="empty-state-icon mb-4 mx-auto" style="background-color: var(--error-100); color: var(--error-600);">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 8v4M12 16h.01"/>
+                        </svg>
+                    </div>
+                    <h3 class="modal-title mb-2">Excluir Cliente?</h3>
+                    <p class="text-secondary mb-6">
+                        Esta ação não poderá ser desfeita. Todos os dados do cliente serão permanentemente removidos.
+                    </p>
+                    <div class="flex gap-3 justify-center">
+                        <button class="btn btn-secondary" id="cancelar-exclusao">
+                            Cancelar
+                        </button>
+                        <button class="btn" style="background-color: var(--error-600); color: white;" id="confirmar-exclusao">
+                            <span class="btn-texto">Excluir</span>
+                            <span class="btn-loading" style="display: none;">
+                                <svg class="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" fill="none"/>
+                                    <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" fill="none"/>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast de Notificação -->
+        <div class="toast-container" id="toast-container" style="display: none;">
+            <div class="toast toast-success">
+                <span class="toast-mensagem"></span>
+                <button class="toast-fechar ml-3">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Helpers
+        function getCSRFToken() {
+            const name = 'csrftoken';
+            const cookies = document.cookie.split(';').map(c => c.trim());
+            for (const c of cookies) {
+                if (c.startsWith(name + '=')) return decodeURIComponent(c.split('=')[1]);
+            }
+            return '';
+        }
+
+        const API_BASE = '/api/clientes/';
+
+        // Renderização
+        function renderClientes(clientes) {
+            const tbody = document.getElementById('tabela-corpo');
+            tbody.innerHTML = '';
+            if (!clientes.length) {
+                document.getElementById('estado-vazio').style.display = 'block';
+                document.getElementById('paginacao').style.display = 'none';
+                return;
+            }
+            document.getElementById('estado-vazio').style.display = 'none';
+            document.getElementById('paginacao').style.display = 'flex';
+            clientes.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${c.nome} ${c.sobrenome || ''}</td>
+                    <td>${c.cpf || ''}</td>
+                    <td>${c.telefone || ''}</td>
+                    <td>${c.email || ''}</td>
+                    <td>${c.cidade || ''}</td>
+                    <td>
+                        <button class="btn" data-id="${c.id}" onclick="excluirCliente(${c.id})">Excluir</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('total-clientes').textContent = clientes.length;
+        }
+
+        // Requisições à API
+        async function fetchClientes() {
+            const res = await fetch(API_BASE, {credentials: 'same-origin'});
+            if (!res.ok) return renderClientes([]);
+            const data = await res.json();
+            // DRF paginates by default; aceitar list ou paginated response
+            const clientes = Array.isArray(data) ? data : (data.results || []);
+            renderClientes(clientes);
+        }
+
+        async function criarCliente(payload) {
+            const res = await fetch(API_BASE, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload)
+            });
+            return res;
+        }
+
+        async function excluirCliente(id) {
+            if (!confirm('Confirma exclusão deste cliente?')) return;
+            const res = await fetch(`${API_BASE}${id}/`, {
+                method: 'DELETE',
+                headers: {'X-CSRFToken': getCSRFToken()},
+                credentials: 'same-origin'
+            });
+            if (res.ok) fetchClientes();
+            else alert('Erro ao excluir');
+        }
+
+        // Interações do DOM
+        document.getElementById('btn-novo-cliente').addEventListener('click', () => {
+            document.getElementById('modal-cliente').style.display = 'block';
+        });
+        document.getElementById('fechar-modal').addEventListener('click', () => {
+            document.getElementById('modal-cliente').style.display = 'none';
+        });
+
+        document.getElementById('form-cliente').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const payload = Object.fromEntries(new FormData(form).entries());
+            const res = await criarCliente(payload);
+            if (res.ok) {
+                form.reset();
+                document.getElementById('modal-cliente').style.display = 'none';
+                fetchClientes();
+            } else {
+                const err = await res.json().catch(() => null);
+                alert('Erro ao salvar: ' + (err && JSON.stringify(err) || res.statusText));
+            }
+        });
+
+        // Toggle tema claro/escuro
+        document.getElementById('btn-tema').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            document.body.classList.toggle('light-mode');
+            const lightIcon = document.querySelector('.theme-toggle-light');
+            const darkIcon = document.querySelector('.theme-toggle-dark');
+            if (document.body.classList.contains('dark-mode')) {
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'inline';
+            } else {
+                lightIcon.style.display = 'inline';
+                darkIcon.style.display = 'none';
+            }
+        });
+
+        // Inicialização
+        fetchClientes();
+    </script>
+</body>
+</html>
+{% endblock %}
