@@ -1,3 +1,142 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, CreateView, UpdateView
+from django.views import View
+from django.urls import reverse_lazy
+from .models import Veiculo
 
-# Create your views here.
+
+class GerenciarVeiculo(LoginRequiredMixin, ListView):
+    """
+    View baseada em classe para listar todos os veículos cadastrados.
+    
+    Requer que o usuário esteja autenticado (LoginRequiredMixin).
+    Lista os veículos ordenados alfabeticamente por modelo.
+    
+    Attributes:
+        model: Modelo Veiculo que será consultado
+        template_name: Template responsável pela renderização da lista
+        context_object_name: Nome da variável de contexto disponível no template
+        ordering: Critério de ordenação dos registros (por modelo)
+    """
+    model = Veiculo
+    template_name = 'veiculos/list.html'
+    context_object_name = 'veiculos'
+    ordering = ['modelo']
+    
+    def get_queryset(self):
+        return Veiculo.objects.filter(is_active=True).order_by('modelo')
+    
+class CriarVeiculo(LoginRequiredMixin, CreateView):
+    """
+    View baseada em classe para criação de novos veículos.
+    
+    Requer que o usuário esteja autenticado (LoginRequiredMixin).
+    Associa automaticamente o veículo criado ao usuário logado.
+    
+    Attributes:
+        model: Modelo Veiculo que será utilizado no formulário
+        fields: Campos do modelo que serão exibidos no formulário
+        template_name: Template responsável pela renderização do formulário
+        success_url: URL de redirecionamento após o cadastro bem-sucedido
+    
+    Methods:
+        form_valid: Sobrescrito para associar o usuário logado ao veículo antes de salvar
+    """
+    model = Veiculo
+    fields = ['marca', 'modelo', 'ano', 'preco', 'descricao']
+    template_name = 'veiculos/modal_form.html'
+    success_url = reverse_lazy('lista_veiculos')
+    
+class EditarVeiculo(LoginRequiredMixin, UpdateView):
+    """
+    View baseada em classe para edição de veículos existentes.
+    
+    Requer que o usuário esteja autenticado (LoginRequiredMixin).
+    Permite editar os detalhes de um veículo específico.
+    
+    Attributes:
+        model: Modelo Veiculo que será utilizado no formulário
+        fields: Campos do modelo que serão exibidos no formulário
+        template_name: Template responsável pela renderização do formulário
+        success_url: URL de redirecionamento após a edição bem-sucedida
+    """
+    model = Veiculo
+    fields = ['marca', 'modelo', 'ano', 'preco', 'descricao']
+    template_name = 'veiculos/modal_edit.html'
+    success_url = reverse_lazy('lista_veiculos')
+    
+class DetalheVeiculo(LoginRequiredMixin, View):
+    """
+    View baseada em classe para exibir os detalhes de um veículo específico.
+    
+    Requer que o usuário esteja autenticado (LoginRequiredMixin).
+    Exibe as informações detalhadas de um veículo selecionado.
+    
+    Methods:
+        get: Processa a requisição GET para exibir os detalhes do veículo
+    """
+    def get(self, request, pk):
+        """
+        Processa a requisição GET para exibir os detalhes do veículo.
+        
+        Args:
+            request: Objeto HttpRequest contendo os dados da requisição
+            pk: Chave primária do veículo a ser exibido
+            
+        Returns:
+            HttpResponse: Resposta HTTP com a renderização dos detalhes do veículo"""
+        veiculo = get_object_or_404(Veiculo, pk=pk)
+        return render(request, 'veiculos/modal_detail.html', {'veiculo': veiculo})
+    
+class DesativarVeiculo(LoginRequiredMixin, View):
+    """
+    View baseada em classe para desativar veículos.
+    
+    Requer que o usuário esteja autenticado (LoginRequiredMixin).
+    Em vez de excluir o veículo do banco de dados, marca-o como inativo.
+    
+    Methods:
+        post: Processa a requisição POST para desativar o veículo
+    """
+    def post(self, request, pk):
+        """
+        Desativa um veículo específico.
+        
+        Args:
+            request: Objeto HttpRequest contendo os dados da requisição
+            pk: Chave primária do veículo a ser desativado
+            
+        Returns:
+            HttpResponse: Resposta HTTP de redirecionamento após a desativação
+        """
+        veiculo = get_object_or_404(Veiculo, pk=pk)
+        veiculo.is_active = False
+        veiculo.save()
+        return redirect('lista_veiculos')
+    
+class ReativarVeiculo(LoginRequiredMixin, View):
+    """
+    View baseada em classe para reativar veículos desativados.
+    
+    Requer que o usuário esteja autenticado (LoginRequiredMixin).
+    Permite reativar um veículo previamente desativado.
+    
+    Methods:
+        post: Processa a requisição POST para reativar o veículo
+    """
+    def post(self, request, pk):
+        """
+        Reativa um veículo específico.
+        
+        Args:
+            request: Objeto HttpRequest contendo os dados da requisição
+            pk: Chave primária do veículo a ser reativado
+            
+        Returns:
+            HttpResponse: Resposta HTTP de redirecionamento após a reativação
+        """
+        veiculo = get_object_or_404(Veiculo, pk=pk)
+        veiculo.is_active = True
+        veiculo.save()
+        return redirect('lista_veiculos')
