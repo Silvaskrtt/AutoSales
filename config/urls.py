@@ -24,6 +24,7 @@ urlpatterns = [
     # Autenticação (django-allauth)
     path('accounts/', include('allauth.urls')), # Login, logout, signup, etc.
     
-    
-    path('', include('clientes.urls'))
+    # URLs das apps
+    path('', include('clientes.urls')),
+    path('', include('veiculos.urls')),
 ]
