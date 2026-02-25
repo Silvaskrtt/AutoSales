@@ -1,61 +1,210 @@
 {% extends "account/base_entrance.html" %}
+{% load static %}
 {% load i18n %}
 {% load allauth account %}
+
 {% block head_title %}
     {% trans "Sign In" %}
 {% endblock head_title %}
-{% block content %}
-    {% element h1 %}
-        {% trans "Sign In" %}
-    {% endelement %}
-    {% if not SOCIALACCOUNT_ONLY %}
-        {% setvar link %}
-            <a href="{{ signup_url }}">
-            {% endsetvar %}
-            {% setvar end_link %}
-            </a>
-        {% endsetvar %}
-        {% element p %}
-            {% blocktranslate %}If you have not created an account yet, then please {{ link }}sign up{{ end_link }} first.{% endblocktranslate %}
-        {% endelement %}
-        {% url 'account_login' as login_url %}
-        {% element form form=form method="post" action=login_url tags="entrance,login" %}
-            {% slot body %}
-                {% csrf_token %}
-                {% element fields form=form unlabeled=True %}
-                {% endelement %}
-                {{ redirect_field }}
-            {% endslot %}
-            {% slot actions %}
-                {% element button type="submit" tags="prominent,login" %}
-                    {% trans "Sign In" %}
-                {% endelement %}
-            {% endslot %}
-        {% endelement %}
-    {% endif %}
-    {% if LOGIN_BY_CODE_ENABLED or PASSKEY_LOGIN_ENABLED %}
-        {% element hr %}
-        {% endelement %}
-        {% element button_group vertical=True %}
-            {% if PASSKEY_LOGIN_ENABLED %}
-                {% element button type="submit" form="mfa_login" id="passkey_login" tags="prominent,login,outline,primary" %}
-                    {% trans "Sign in with a passkey" %}
-                {% endelement %}
-            {% endif %}
-            {% if LOGIN_BY_CODE_ENABLED %}
-                {% element button href=request_login_code_url tags="prominent,login,outline,primary" %}
-                    {% trans "Send me a sign-in code" %}
-                {% endelement %}
-            {% endif %}
-        {% endelement %}
-    {% endif %}
-    {% if SOCIALACCOUNT_ENABLED %}
-        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
-    {% endif %}
-{% endblock content %}
-{% block extra_body %}
+
+{% block extra_head %}
     {{ block.super }}
-    {% if PASSKEY_LOGIN_ENABLED %}
-        {% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_login" %}
-    {% endif %}
-{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock extra_head %}
+
+{% block content %}
+<div class="login-wrapper" id="loginWrapper">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+    
+    <div class="login-container">
+        <!-- Logo & Title Section -->
+        <div class="logo-section">
+            <div class="logo">
+                🚗
+            </div>
+            <h1 class="company-title">AutoVendas Pro</h1>
+            <p class="tagline">Gestão Inteligente de Vendas de Automóveis</p>
+        </div>
+
+        <!-- Login Form Card -->
+        <div class="form-card">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="feedback-message show {% if message.tags == 'success' %}feedback-success{% elif message.tags == 'error' %}feedback-error{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if not SOCIALACCOUNT_ONLY %}
+                {% url 'account_login' as login_url %}
+                
+                <form method="post" action="{{ login_url }}" id="loginForm">
+                    {% csrf_token %}
+                    
+                    {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_login">Usuário ou E-mail</label>
+                        <input 
+                            type="text" 
+                            name="login" 
+                            placeholder="Seu usuário ou e-mail" 
+                            class="input-field" 
+                            id="id_login" 
+                            required
+                            autocomplete="username"
+                        >
+                        {% if form.login.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.login.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <small class="text-tertiary" style="font-size: var(--font-size-xs); margin-top: var(--spacing-1); display: block;">
+                            Pode ser seu nome de usuário ou e-mail cadastrado
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_password">Senha</label>
+                        <input 
+                            type="password" 
+                            name="password" 
+                            placeholder="Sua senha segura" 
+                            class="input-field" 
+                            id="id_password" 
+                            required
+                            autocomplete="current-password"
+                        >
+                        {% if form.password.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="feedback-message show feedback-error">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-footer">
+                        <label class="checkbox-group">
+                            <input type="checkbox" name="remember" class="checkbox" id="id_remember">
+                            <span>Lembrar-me</span>
+                        </label>
+                        <a href="{% url 'account_reset_password' %}" class="forgot-password" id="forgotPasswordLink">
+                            Esqueci minha senha
+                        </a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="loginButton">
+                        Entrar no Sistema
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if LOGIN_BY_CODE_ENABLED or PASSKEY_LOGIN_ENABLED %}
+                <hr>
+                
+                {% if PASSKEY_LOGIN_ENABLED %}
+                    <form method="post" action="{% url 'mfa_login_webauthn' %}" id="mfa_login">
+                        {% csrf_token %}
+                        {{ redirect_field }}
+                        <button type="submit" class="btn btn-primary mt-3" id="passkey_login">
+                            {% trans "Sign in with a passkey" %}
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if LOGIN_BY_CODE_ENABLED %}
+                    <a href="{{ request_login_code_url }}" class="btn btn-primary mt-3">
+                        {% trans "Send me a sign-in code" %}
+                    </a>
+                {% endif %}
+            {% endif %}
+
+            {% if SOCIALACCOUNT_ENABLED %}
+                {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+            {% endif %}
+
+            <div class="signup-section">
+                Novo por aqui?
+                <a href="{{ signup_url }}" class="signup-link" id="signupLink">
+                    Criar conta
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const loginWrapper = document.getElementById('loginWrapper');
+    let isDarkMode = false;
+
+    // Check saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        isDarkMode = true;
+        loginWrapper.classList.add('dark-mode');
+        themeToggle.textContent = '☀️';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+            loginWrapper.classList.add('dark-mode');
+            themeToggle.textContent = '☀️';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            loginWrapper.classList.remove('dark-mode');
+            themeToggle.textContent = '🌙';
+            localStorage.setItem('theme', 'light');
+        }
+    });
+
+    // Remember Me functionality
+    const rememberCheckbox = document.getElementById('id_remember');
+    const loginInput = document.getElementById('id_login');
+    const savedLogin = localStorage.getItem('savedLogin');
+
+    if (savedLogin && loginInput) {
+        loginInput.value = savedLogin;
+        if (rememberCheckbox) {
+            rememberCheckbox.checked = true;
+        }
+    }
+
+    if (rememberCheckbox && loginInput) {
+        rememberCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                localStorage.setItem('savedLogin', loginInput.value);
+            } else {
+                localStorage.removeItem('savedLogin');
+            }
+        });
+
+        loginInput.addEventListener('input', function() {
+            if (rememberCheckbox.checked) {
+                localStorage.setItem('savedLogin', this.value);
+            }
+        });
+    }
+</script>
+
+{% if PASSKEY_LOGIN_ENABLED %}
+    {% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_login" %}
+{% endif %}
+
+{% endblock content %}
