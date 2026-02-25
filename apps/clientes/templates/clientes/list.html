@@ -1,199 +1,185 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciar Clientes - Concessionária</title>
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
-</head>
-<body class="bg-secondary">
-    <div class="container">
-        <!-- Cabeçalho -->
-        <header class="header">
-            <div class="header-content">
-                <div class="flex items-center gap-3">
-                    <div class="logo">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 17h2l.64-2.54c.24-.96.36-1.94.36-2.93V10h-2M5 17H3v-4.5A2.5 2.5 0 0 1 5.5 10H6M19 17h-2M5 17h2"/>
-                            <circle cx="7.5" cy="17" r="2.5"/>
-                            <circle cx="16.5" cy="17" r="2.5"/>
-                            <path d="M6 10V5h12v5"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold text-gradient">Gerenciar Clientes</h1>
-                        <p class="text-sm text-tertiary">Sistema de Vendas de Carros</p>
-                    </div>
-                </div>
-                <button class="theme-toggle" id="btn-tema">
-                    <span class="theme-toggle-light">☀️</span>
-                    <span class="theme-toggle-dark" style="display: none;">🌙</span>
-                </button>
+<!-- Cabeçalho -->
+<header class="header">
+    <div class="header-content">
+        <div class="flex items-center gap-3">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 17h2l.64-2.54c.24-.96.36-1.94.36-2.93V10h-2M5 17H3v-4.5A2.5 2.5 0 0 1 5.5 10H6M19 17h-2M5 17h2"/>
+                    <circle cx="7.5" cy="17" r="2.5"/>
+                    <circle cx="16.5" cy="17" r="2.5"/>
+                    <path d="M6 10V5h12v5"/>
+                </svg>
             </div>
-        </header>
-
-        <!-- Conteúdo Principal -->
-        <main class="main-content">
-            <!-- Cards de Estatísticas -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon stat-icon-primary">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                <circle cx="12" cy="7" r="4"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="stat-info">
-                        <p class="stat-label">Total de Clientes</p>
-                        <p class="stat-value" id="total-clientes">0</p>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon stat-icon-success">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 6v6l4 2"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="stat-info">
-                        <p class="stat-label">Ativos este Mês</p>
-                        <p class="stat-value" id="ativos-mes">0</p>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon stat-icon-warning">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                <circle cx="12" cy="10" r="3"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="stat-info">
-                        <p class="stat-label">Cidades Atendidas</p>
-                        <p class="stat-value" id="cidades-atendidas">0</p>
-                    </div>
-                </div>
+            <div>
+                <h1 class="text-2xl font-bold text-gradient">Gerenciar Clientes</h1>
+                <p class="text-sm text-tertiary">Sistema de Vendas de Carros</p>
             </div>
+        </div>
+        <button class="theme-toggle" id="btn-tema">
+            <span class="theme-toggle-light">☀️</span>
+            <span class="theme-toggle-dark" style="display: none;">🌙</span>
+        </button>
+    </div>
+</header>
 
-            <!-- Barra de Busca e Ações -->
-            <div class="flex-between mb-6">
-                <div class="search-wrapper">
-                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="M21 21l-4.35-4.35"/>
+<!-- Conteúdo Principal -->
+<main class="main-content">
+    <!-- Cards de Estatísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon stat-icon-primary">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
                     </svg>
-                    <input type="text" 
-                           class="search-input" 
-                           placeholder="Buscar por nome, CPF, e-mail ou cidade..."
-                           id="busca-cliente">
-                </div>
-                <button class="btn btn-primary" id="btn-novo-cliente">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 5v14M5 12h14"/>
-                    </svg>
-                    <span>Novo Cliente</span>
-                </button>
-            </div>
-
-            <!-- Tabela de Clientes -->
-            <div class="table-container">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>CPF</th>
-                            <th>Telefone</th>
-                            <th>E-mail</th>
-                            <th>Cidade</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-corpo">
-                        <!-- Linhas serão inseridas via JavaScript -->
-                    </tbody>
-                </table>
-
-                <!-- Estado Vazio (quando não há clientes) -->
-                <div class="empty-state" id="estado-vazio" style="display: none;">
-                    <div class="empty-state-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    </div>
-                    <h3 class="empty-state-title">Nenhum cliente cadastrado</h3>
-                    <p class="empty-state-text">Comece cadastrando seu primeiro cliente</p>
-                    <button class="btn btn-primary" id="btn-primeiro-cliente">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 5v14M5 12h14"/>
-                        </svg>
-                        Adicionar Cliente
-                    </button>
-                </div>
-
-                <!-- Paginação -->
-                <div class="pagination flex-between p-4" id="paginacao">
-                    <p class="text-sm text-tertiary" id="paginacao-info">Mostrando 0 de 0 clientes</p>
-                    <div class="pagination">
-                        <button class="pagination-arrow" id="pagina-anterior" disabled>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M15 18l-6-6 6-6"/>
-                            </svg>
-                        </button>
-                        <div class="pagination" id="paginacao-numeros"></div>
-                        <button class="pagination-arrow" id="proxima-pagina" disabled>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </button>
-                    </div>
                 </div>
             </div>
-
-            <!-- Aviso de Limite -->
-            <div class="feedback-message feedback-error" id="aviso-limite" style="display: none;">
-                <div class="flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="stat-info">
+                <p class="stat-label">Total de Clientes</p>
+                <p class="stat-value" id="total-clientes">0</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon stat-icon-success">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 8v4M12 16h.01"/>
+                        <path d="M12 6v6l4 2"/>
                     </svg>
-                    <p>Limite máximo de 999 clientes atingido. Exclua alguns clientes para adicionar novos.</p>
                 </div>
             </div>
-        </main>
+            <div class="stat-info">
+                <p class="stat-label">Ativos este Mês</p>
+                <p class="stat-value" id="ativos-mes">0</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon stat-icon-warning">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="stat-info">
+                <p class="stat-label">Cidades Atendidas</p>
+                <p class="stat-value" id="cidades-atendidas">0</p>
+            </div>
+        </div>
+    </div>
 
-        {% include 'clientes/modal_form.html' %}
-        {% include 'clientes/modal_delete.html' %}
-        {% include 'clientes/modal_detail.html' %}
-        {% include 'clientes/modal_edit.html' %}
+    <!-- Barra de Busca e Ações -->
+    <div class="flex-between mb-6">
+        <div class="search-wrapper">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" 
+                   class="search-input" 
+                   placeholder="Buscar por nome, CPF, e-mail ou cidade..."
+                   id="busca-cliente">
+        </div>
+        <button class="btn btn-primary" id="btn-novo-cliente">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+            <span>Novo Cliente</span>
+        </button>
+    </div>
 
-        <!-- Toast de Notificação -->
-        <div class="toast-container" id="toast-container" style="display: none;">
-            <div class="toast toast-success">
-                <span class="toast-mensagem"></span>
-                <button class="toast-fechar ml-3">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12"/>
+    <!-- Tabela de Clientes -->
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Telefone</th>
+                    <th>E-mail</th>
+                    <th>Cidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-corpo">
+                <!-- Linhas serão inseridas via JavaScript -->
+            </tbody>
+        </table>
+
+        <!-- Estado Vazio (quando não há clientes) -->
+        <div class="empty-state" id="estado-vazio" style="display: none;">
+            <div class="empty-state-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+            </div>
+            <h3 class="empty-state-title">Nenhum cliente cadastrado</h3>
+            <p class="empty-state-text">Comece cadastrando seu primeiro cliente</p>
+            <button class="btn btn-primary" id="btn-primeiro-cliente">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Adicionar Cliente
+            </button>
+        </div>
+
+        <!-- Paginação -->
+        <div class="pagination flex-between p-4" id="paginacao">
+            <p class="text-sm text-tertiary" id="paginacao-info">Mostrando 0 de 0 clientes</p>
+            <div class="pagination">
+                <button class="pagination-arrow" id="pagina-anterior" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+                <div class="pagination" id="paginacao-numeros"></div>
+                <button class="pagination-arrow" id="proxima-pagina" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
                     </svg>
                 </button>
             </div>
         </div>
     </div>
 
-    <script src="{% static 'js/theme.js' %}"></script>
-    <script src="{% static 'js/clientes.js' %}"></script>
-</body>
-</html>
+    <!-- Aviso de Limite -->
+    <div class="feedback-message feedback-error" id="aviso-limite" style="display: none;">
+        <div class="flex items-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4M12 16h.01"/>
+            </svg>
+            <p>Limite máximo de 999 clientes atingido. Exclua alguns clientes para adicionar novos.</p>
+        </div>
+    </div>
+</main>
+
+{% include 'clientes/modal_form.html' %}
+{% include 'clientes/modal_delete.html' %}
+{% include 'clientes/modal_detail.html' %}
+{% include 'clientes/modal_edit.html' %}
+
+<!-- Toast de Notificação -->
+<div class="toast-container" id="toast-container" style="display: none;">
+    <div class="toast toast-success">
+        <span class="toast-mensagem"></span>
+        <button class="toast-fechar ml-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<script src="{% static 'js/theme.js' %}"></script>
+<script src="{% static 'js/clientes.js' %}"></script>
 {% endblock %}
