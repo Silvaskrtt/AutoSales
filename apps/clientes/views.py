@@ -21,7 +21,7 @@ class GerenciarCliente(LoginRequiredMixin, ListView):
         ordering: Critério de ordenação dos registros (por nome)
     """
     model = Cliente
-    template_name = 'clientes/lista.html'
+    template_name = 'clientes/list.html'
     context_object_name = 'clientes'
     ordering = ['nome']
     
