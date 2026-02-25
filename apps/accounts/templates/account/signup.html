@@ -1,45 +1,191 @@
 {% extends "account/base_entrance.html" %}
+{% load static %}
 {% load allauth i18n %}
+
 {% block head_title %}
-    {% trans "Signup" %}
+    {% trans "Sign Up" %}
 {% endblock head_title %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock extra_head %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Sign Up" %}
-    {% endelement %}
-    {% setvar link %}
-        <a href="{{ login_url }}">
-        {% endsetvar %}
-        {% setvar end_link %}
-        </a>
-    {% endsetvar %}
-    {% element p %}
-        {% blocktranslate %}Already have an account? Then please {{ link }}sign in{{ end_link }}.{% endblocktranslate %}
-    {% endelement %}
-    {% if not SOCIALACCOUNT_ONLY %}
-        {% url 'account_signup' as action_url %}
-        {% element form form=form method="post" action=action_url tags="entrance,signup" %}
-            {% slot body %}
-                {% csrf_token %}
-                {% element fields form=form unlabeled=True %}
-                {% endelement %}
-                {{ redirect_field }}
-            {% endslot %}
-            {% slot actions %}
-                {% element button tags="prominent,signup" type="submit" %}
-                    {% trans "Sign Up" %}
-                {% endelement %}
-            {% endslot %}
-        {% endelement %}
-    {% endif %}
-    {% if PASSKEY_SIGNUP_ENABLED %}
-        {% element hr %}
-        {% endelement %}
-        {% element button href=signup_by_passkey_url tags="prominent,signup,outline,primary" %}
-            {% trans "Sign up using a passkey" %}
-        {% endelement %}
-    {% endif %}
-    {% if SOCIALACCOUNT_ENABLED %}
-        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
-    {% endif %}
+<div class="login-wrapper" id="loginWrapper">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+    
+    <div class="login-container">
+        <!-- Logo & Title Section -->
+        <div class="logo-section">
+            <div class="logo">
+                🚗
+            </div>
+            <h1 class="company-title">AutoVendas Pro</h1>
+            <p class="tagline">Crie sua conta gratuitamente</p>
+        </div>
+
+        <!-- Sign Up Form Card -->
+        <div class="form-card">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="feedback-message show {% if message.tags == 'success' %}feedback-success{% elif message.tags == 'error' %}feedback-error{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if not SOCIALACCOUNT_ONLY %}
+                {% url 'account_signup' as action_url %}
+                
+                <form method="post" action="{{ action_url }}">
+                    {% csrf_token %}
+                    
+                    {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                    {% endif %}
+
+                    <!-- Username Field -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_username">Nome de usuário</label>
+                        <input 
+                            type="text" 
+                            name="username" 
+                            placeholder="Escolha um nome de usuário" 
+                            class="input-field" 
+                            id="id_username" 
+                            required
+                        >
+                        {% if form.username.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.username.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_email">E-mail</label>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            placeholder="seu.email@empresa.com" 
+                            class="input-field" 
+                            id="id_email" 
+                            required
+                        >
+                        {% if form.email.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.email.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_password1">Senha</label>
+                        <input 
+                            type="password" 
+                            name="password1" 
+                            placeholder="Crie uma senha segura" 
+                            class="input-field" 
+                            id="id_password1" 
+                            required
+                        >
+                        {% if form.password1.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password1.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password Confirmation Field -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_password2">Confirmar senha</label>
+                        <input 
+                            type="password" 
+                            name="password2" 
+                            placeholder="Digite a senha novamente" 
+                            class="input-field" 
+                            id="id_password2" 
+                            required
+                        >
+                        {% if form.password2.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password2.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="feedback-message show feedback-error">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary">
+                        Criar minha conta
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if PASSKEY_SIGNUP_ENABLED %}
+                <hr>
+                <a href="{{ signup_by_passkey_url }}" class="btn btn-primary">
+                    {% trans "Sign up using a passkey" %}
+                </a>
+            {% endif %}
+
+            {% if SOCIALACCOUNT_ENABLED %}
+                {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+            {% endif %}
+
+            <!-- Sign In Link -->
+            <div class="signup-section">
+                Já tem uma conta?
+                <a href="{{ login_url }}" class="signup-link">
+                    Fazer login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const loginWrapper = document.getElementById('loginWrapper');
+    let isDarkMode = false;
+
+    // Check saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        isDarkMode = true;
+        loginWrapper.classList.add('dark-mode');
+        themeToggle.textContent = '☀️';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+            loginWrapper.classList.add('dark-mode');
+            themeToggle.textContent = '☀️';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            loginWrapper.classList.remove('dark-mode');
+            themeToggle.textContent = '🌙';
+            localStorage.setItem('theme', 'light');
+        }
+    });
+</script>
 {% endblock content %}
