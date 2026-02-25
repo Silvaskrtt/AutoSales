@@ -1,7 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
-from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView, CreateView, UpdateView
 from clientes.models import Cliente
 from django.urls import reverse_lazy
@@ -46,7 +45,7 @@ class CriarCliente(LoginRequiredMixin, CreateView):
     """
     model = Cliente
     fields = ['nome', 'sobrenome', 'cpf', 'telefone', 'email', 'rua', 'numero', 'bairro', 'cidade', 'estado']
-    template_name = 'clientes/criar_cliente.html'
+    template_name = 'clientes/modal_form.html'
     success_url = reverse_lazy('lista_clientes')
     
     def form_valid(self, form):
@@ -79,7 +78,7 @@ class EditarCliente(LoginRequiredMixin, UpdateView):
     """
     model = Cliente
     fields = ['nome', 'sobrenome', 'cpf', 'telefone', 'email', 'rua', 'numero', 'bairro', 'cidade', 'estado']
-    template_name = 'clientes/editar_cliente.html'
+    template_name = 'clientes/modal_edit.html'
     success_url = reverse_lazy('lista_clientes')
     
 class DesativarCliente(LoginRequiredMixin, View):
@@ -158,4 +157,4 @@ class DetalheCliente(LoginRequiredMixin, View):
             HttpResponse: Resposta HTTP com a renderização dos detalhes do cliente
         """
         cliente = get_object_or_404(Cliente, pk=pk)
-        return render(request, 'clientes/detalhe_cliente.html', {'cliente': cliente})
+        return render(request, 'clientes/modal_detail.html', {'cliente': cliente})
