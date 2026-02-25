@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+{% load static i18n %}
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AutoSales{% endblock %}</title>
+
+    <!-- CSS Global -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_head %}{% endblock extra_head %}
+    {% block css %}{% endblock css %}
+    <style>
+        /* estilos mínimos para evitar layout quebrado antes do CSS completo */
+        .container{max-width:1100px;margin:0 auto;padding:16px}
+        header, footer{padding:12px 0}
+    </style>
+</head>
+<body>
+    <!-- forçar geração do cookie CSRF para JS (utilitário oculto) -->
+    <form style="display:none">{% csrf_token %}</form>
+    <!-- Header com navegação principal -->
+    <header>
+        <div class="container">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <div style="font-size:24px">🚗</div>
+                    <a href="/" style="text-decoration:none;color:inherit"><strong>AutoSales</strong></a>
+                </div>
+
+                <!-- Menu de navegação -->
+                <nav>
+                    <ul style="display:flex;gap:12px;list-style:none;margin:0;padding:0">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="{% url 'lista_clientes' %}">{% trans "Clientes" %}</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Área do usuário -->
+                <div>
+                    {% if user.is_authenticated %}
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <div style="width:36px;height:36px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center">{{ user.username|first|upper }}</div>
+                            <div style="text-align:right">
+                                <p style="margin:0">{{ user.get_full_name|default:user.username }}</p>
+                                <p style="margin:0;font-size:12px;color:#666">{{ user.email }}</p>
+                            </div>
+                        </div>
+                        <form method="post" action="{% url 'account_logout' %}">
+                            {% csrf_token %}
+                            <button type="submit">{% trans "Sair" %}</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'account_login' %}">{% trans "Entrar" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mensagens do sistema -->
+    <div class="container">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Conteúdo principal -->
+    <main class="container">
+        {% block content %}{% endblock content %}
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <div class="container">
+            <p style="margin:0">&copy; {% now "Y" %} AutoSales. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Modais (podem ser preenchidos pelos templates filhos) -->
+    {% block modals %}{% endblock modals %}
+
+    <!-- JavaScript Global -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block js %}{% endblock js %}
+</body>
+</html>
