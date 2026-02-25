@@ -56,6 +56,8 @@ class Veiculo(models.Model):
         default='DISPONIVEL'
     )
     
+    is_active = models.BooleanField(default=True)
+    
     modelo = models.ForeignKey(Modelo, on_delete=models.CASCADE)
     
     def __str__(self):
