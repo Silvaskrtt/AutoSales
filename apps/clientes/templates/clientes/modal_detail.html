@@ -1,0 +1,116 @@
+<!-- Modal de Detalhes do Cliente -->
+<div class="modal-overlay" id="modal-detalhes" style="display: none;">
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modal-detalhes-titulo">Detalhes do Cliente</h2>
+            <button class="modal-close" id="fechar-modal-detalhes">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="cliente-info-grid">
+                <!-- Informações Pessoais -->
+                <div class="info-section">
+                    <h3 class="info-section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Informações Pessoais
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Nome Completo:</span>
+                            <span class="info-value" id="detalhe-nome"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">CPF:</span>
+                            <span class="info-value" id="detalhe-cpf"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Telefone:</span>
+                            <span class="info-value" id="detalhe-telefone"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">E-mail:</span>
+                            <span class="info-value" id="detalhe-email"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endereço -->
+                <div class="info-section">
+                    <h3 class="info-section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Endereço
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Rua:</span>
+                            <span class="info-value" id="detalhe-rua"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Número:</span>
+                            <span class="info-value" id="detalhe-numero"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Bairro:</span>
+                            <span class="info-value" id="detalhe-bairro"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Cidade:</span>
+                            <span class="info-value" id="detalhe-cidade"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Estado:</span>
+                            <span class="info-value" id="detalhe-estado"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estatísticas -->
+                <div class="info-section">
+                    <h3 class="info-section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                        Estatísticas
+                    </h3>
+                    <div class="stats-mini-grid">
+                        <div class="stat-mini-card">
+                            <span class="stat-mini-label">Total de Compras</span>
+                            <span class="stat-mini-value" id="detalhe-total-compras">0</span>
+                        </div>
+                        <div class="stat-mini-card">
+                            <span class="stat-mini-label">Última Compra</span>
+                            <span class="stat-mini-value" id="detalhe-ultima-compra">N/A</span>
+                        </div>
+                        <div class="stat-mini-card">
+                            <span class="stat-mini-label">Cliente Desde</span>
+                            <span class="stat-mini-value" id="detalhe-data-cadastro">N/A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="fechar-detalhes">
+                Fechar
+            </button>
+            <button type="button" class="btn btn-primary" id="editar-de-detalhes">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                </svg>
+                Editar Cliente
+            </button>
+        </div>
+    </div>
+</div>
