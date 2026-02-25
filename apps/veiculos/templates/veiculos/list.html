@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Header -->
+<header class="header">
+    <div class="container">
+        <div class="header-content">
+            <div class="flex items-center gap-4">
+                <div class="logo">
+                    <svg width="32" height="32" viewbox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gradient">Vehicle Inventory</h1>
+                    <p class="text-sm text-tertiary" id="vehicle-count">0 vehicles</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    <svg id="sun-icon" class="sun-icon hidden" width="20" height="20" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <svg id="moon-icon" class="moon-icon block" width="20" height="20" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+                
+                <button id="add-vehicle-btn" class="btn btn-primary">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Add Vehicle</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container py-6">
+    <!-- Filters -->
+    <div class="filter-group" role="tablist" aria-label="Filter vehicles by status">
+        <button data-filter="all" class="filter-btn active" role="tab" aria-selected="true">All</button>
+        <button data-filter="available" class="filter-btn" role="tab" aria-selected="false">Available</button>
+        <button data-filter="reserved" class="filter-btn" role="tab" aria-selected="false">Reserved</button>
+        <button data-filter="sold" class="filter-btn" role="tab" aria-selected="false">Sold</button>
+    </div>
+
+    <!-- Vehicle Grid -->
+    <div id="vehicle-grid" class="grid grid-auto-fit"></div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="empty-state hidden">
+        <div class="empty-state-icon">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 16a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1" />
+            </svg>
+        </div>
+        <h3 class="empty-state-title">No vehicles yet</h3>
+        <p class="empty-state-text">Add your first vehicle to get started</p>
+        <button class="btn btn-primary" onclick="openAddModal()">Add Vehicle</button>
+    </div>
+
+    <!-- Limit Warning -->
+    <div id="limit-warning" class="toast toast-warning hidden">
+        ⚠️ Maximum limit of 999 vehicles reached. Please delete some vehicles to add more.
+    </div>
+</main>
+
+<!-- Add/Edit Modal -->
+<div id="modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="modal-title" class="modal-title">Add New Vehicle</h2>
+            <button id="close-modal-btn" class="modal-close" onclick="closeModal()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <form id="vehicle-form">
+                <input type="hidden" id="vehicle-id">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="brand" class="form-label">Brand</label>
+                        <input type="text" id="brand" required class="input-field" placeholder="Toyota">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="model" class="form-label">Model</label>
+                        <input type="text" id="model" required class="input-field" placeholder="Camry">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="year" class="form-label">Year</label>
+                        <input type="number" id="year" required min="1900" max="2030" class="input-field" placeholder="2024">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="price" class="form-label">Price ($)</label>
+                        <input type="number" id="price" required min="0" class="input-field" placeholder="25000">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label for="color" class="form-label">Color</label>
+                        <input type="text" id="color" required class="input-field" placeholder="Silver">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="mileage" class="form-label">Mileage</label>
+                        <input type="number" id="mileage" required min="0" class="input-field" placeholder="15000">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" required class="select-field">
+                        <option value="available">Available</option>
+                        <option value="reserved">Reserved</option>
+                        <option value="sold">Sold</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" id="cancel-btn" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" form="vehicle-form" id="submit-btn" class="btn btn-primary">
+                <span id="submit-text">Add Vehicle</span>
+                <span id="submit-loading" class="hidden">
+                    <svg class="spinner animate-spin" width="20" height="20" viewbox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal modal-sm">
+        <div class="modal-body text-center">
+            <div class="empty-state-icon mx-auto mb-4">
+                <svg width="48" height="48" fill="none" stroke="currentColor" viewbox="0 0 24 24" class="text-error-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </div>
+            
+            <h3 class="text-xl font-bold mb-2">Delete Vehicle?</h3>
+            <p class="text-secondary mb-6">This action cannot be undone.</p>
+            
+            <div class="flex gap-3 justify-center">
+                <button id="cancel-delete-btn" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button id="confirm-delete-btn" class="btn btn-primary bg-gradient-error">
+                    <span id="delete-text">Delete</span>
+                    <span id="delete-loading" class="hidden">
+                        <svg class="spinner animate-spin" width="20" height="20" viewbox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast hidden">
+    <div class="toast-content">
+        <span id="toast-message"></span>
+    </div>
+</div>
+
+<script>
+    // Theme Toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const appTheme = document.getElementById('app-theme');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    
+    themeToggle.addEventListener('click', () => {
+        if (appTheme.classList.contains('light-mode')) {
+            appTheme.classList.remove('light-mode');
+            appTheme.classList.add('dark-mode');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            appTheme.classList.remove('dark-mode');
+            appTheme.classList.add('light-mode');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+            localStorage.setItem('theme', 'light');
+        }
+    });
+    
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        appTheme.classList.remove('light-mode');
+        appTheme.classList.add('dark-mode');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+    }
+
+    // Modal functions
+    function openAddModal() {
+        document.getElementById('modal').classList.remove('hidden');
+        document.getElementById('modal-title').textContent = 'Add New Vehicle';
+        document.getElementById('submit-text').textContent = 'Add Vehicle';
+        document.getElementById('vehicle-form').reset();
+        document.getElementById('vehicle-id').value = '';
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.add('hidden');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('delete-modal').classList.add('hidden');
+    }
+
+    // Close modals when clicking outside
+    document.getElementById('modal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    document.getElementById('delete-modal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeDeleteModal();
+    });
+
+    // Filter functionality
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
+            this.classList.add('active');
+            this.setAttribute('aria-selected', 'true');
+            // Filter vehicles logic here
+            const filter = this.dataset.filter;
+            filterVehicles(filter);
+        });
+    });
+
+    function filterVehicles(filter) {
+        // Implement vehicle filtering logic
+        console.log('Filtering:', filter);
+    }
+</script>
+
+<script src="{% static 'js/veiculos.js' %}"></script>
+{% endblock %}
