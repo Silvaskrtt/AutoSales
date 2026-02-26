@@ -1,0 +1,185 @@
+/* clientes/static/clientes/css/style.css */
+
+/* Background Effects */
+.glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: float 8s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(30px, -30px);
+    }
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(34, 211, 238, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(34, 211, 238, 0.1);
+}
+
+.glass-input {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(34, 211, 238, 0.2);
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    border-color: rgba(34, 211, 238, 0.6);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+    outline: none;
+}
+
+.glass-table {
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.glass-table-row {
+    border-bottom: 1px solid rgba(34, 211, 238, 0.1);
+    transition: all 0.3s ease;
+}
+
+.glass-table-row:hover {
+    background: rgba(34, 211, 238, 0.05);
+}
+
+/* Buttons */
+.neon-btn {
+    background: linear-gradient(135deg, #0891b2 0%, #22d3ee 50%, #2dd4bf 100%);
+    box-shadow: 0 4px 15px rgba(34, 211, 238, 0.4);
+    transition: all 0.3s ease;
+}
+
+.neon-btn:hover:not(:disabled) {
+    box-shadow: 0 6px 25px rgba(34, 211, 238, 0.6), 0 0 40px rgba(34, 211, 238, 0.3);
+    transform: translateY(-2px);
+}
+
+.neon-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.neon-btn-outline {
+    background: transparent;
+    border: 1px solid rgba(34, 211, 238, 0.5);
+    color: #22d3ee;
+    transition: all 0.3s ease;
+}
+
+.neon-btn-outline:hover {
+    background: rgba(34, 211, 238, 0.1);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+}
+
+/* Status Badges */
+.status-active {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #4ade80;
+}
+
+.status-inactive {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}
+
+/* Action Buttons */
+.action-btn {
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Toast Notifications */
+.toast {
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* Delete Confirmation */
+.delete-confirm {
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    border: 2px solid rgba(34, 211, 238, 0.2);
+    border-top-color: #22d3ee;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Modal Styles */
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 640px) {
+    .glass-card {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+}

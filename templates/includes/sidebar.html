@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="flex min-h-screen">
+    <!-- Sidebar Toggle Button (Mobile) -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <span>☰</span>
+    </button>
+    
+    <!-- Overlay (Mobile) -->
+    <div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <!-- Header -->
+        <div class="sidebar-header">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">AutoSales</span>
+            </div>
+        </div>
+
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="user-avatar">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
+                {% else %}
+                    <span class="avatar-initials">{{ user.username|first|upper }}</span>
+                {% endif %}
+            </div>
+            <div class="user-details">
+                <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                <span class="user-email">{{ user.email }}</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <a href="{% url 'dashboard' %}">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                    <a href="{% url 'profile' %}">
+                        <span class="nav-icon">👤</span>
+                        <span class="nav-text">Perfil</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item {% if request.resolver_match.url_name == 'account_email' %}active{% endif %}">
+                    <a href="{% url 'account_email' %}">
+                        <span class="nav-icon">📧</span>
+                        <span class="nav-text">E-mails</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item {% if request.resolver_match.url_name == 'account_change_password' %}active{% endif %}">
+                    <a href="{% url 'account_change_password' %}">
+                        <span class="nav-icon">🔒</span>
+                        <span class="nav-text">Senha</span>
+                    </a>
+                </li>
+                
+                {% if user.is_staff %}
+                <li class="nav-item {% if request.resolver_match.url_name == 'admin' %}active{% endif %}">
+                    <a href="{% url 'admin:index' %}">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-text">Admin</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <li class="nav-divider"></li>
+                
+                <li class="nav-item">
+                    <a href="{% url 'account_logout' %}">
+                        <span class="nav-icon">🚪</span>
+                        <span class="nav-text">Sair</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Footer -->
+        <div class="sidebar-footer">
+            <p>© {% now "Y" %} AutoSales</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        {% block sidebar_content %}{% endblock %}
+    </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+    
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', openSidebar);
+    }
+    
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
+            closeSidebar();
+        }
+    });
+    
+    // Close on window resize (if going to desktop)
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 1024 && sidebar && sidebar.classList.contains('open')) {
+            closeSidebar();
+        }
+    });
+    
+    // Active link highlight
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.nav-item a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && currentPath === href) {
+            link.closest('.nav-item').classList.add('active');
+        }
+    });
+});
+</script>
+{% endblock %}
