@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 from .models import User
+from django.contrib.auth.models import Group
+from django.contrib.auth.admin import GroupAdmin
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
@@ -30,3 +32,17 @@ class CustomUserAdmin(UserAdmin):
     
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
+
+
+# Re-register Group with horizontal permissions widget for easier admin management
+try:
+    admin.site.unregister(Group)
+except Exception:
+    pass
+
+
+class CustomGroupAdmin(GroupAdmin):
+    filter_horizontal = ('permissions',)
+
+
+admin.site.register(Group, CustomGroupAdmin)

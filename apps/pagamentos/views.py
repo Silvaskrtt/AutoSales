@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView
 
@@ -7,7 +7,8 @@ from .models import Pagamento
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
-class GerenciarPagamentos(LoginRequiredMixin, ListView):
+class GerenciarPagamentos(PermissionRequiredMixin, LoginRequiredMixin, ListView):
+    permission_required = 'pagamentos.view_pagamento'
     """
     View baseada em classe para listar todos os pagamentos cadastrados.
     
@@ -28,7 +29,8 @@ class GerenciarPagamentos(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Pagamento.objects.filter(user=self.request.user).order_by('instituicao_financeira')
         
-class CriarPagamento(LoginRequiredMixin, CreateView):
+class CriarPagamento(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = 'pagamentos.add_pagamento'
     """
     View baseada em classe para criação de novos pagamentos.
     
@@ -64,7 +66,8 @@ class CriarPagamento(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
     
-class EditarPagamento(LoginRequiredMixin, UpdateView):
+class EditarPagamento(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'pagamentos.change_pagamento'
     """
     View baseada em classe para edição de pagamentos existentes.
     
@@ -82,7 +85,8 @@ class EditarPagamento(LoginRequiredMixin, UpdateView):
     template_name = 'pagamentos/modal_edit.html'
     success_url = reverse_lazy('lista_pagamentos')
     
-class DesativarPagamento(LoginRequiredMixin, View):
+class DesativarPagamento(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'pagamentos.change_pagamento'
     """
     View baseada em classe para desativar pagamentos.
     
@@ -109,7 +113,8 @@ class DesativarPagamento(LoginRequiredMixin, View):
         
         return redirect('lista_pagamentos')
     
-class ReativarPagamento(LoginRequiredMixin, View):
+class ReativarPagamento(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'pagamentos.change_pagamento'
     """
     View baseada em classe para reativar pagamentos desativados.
     
@@ -136,7 +141,8 @@ class ReativarPagamento(LoginRequiredMixin, View):
         
         return redirect('lista_pagamentos')
     
-class DetalhePagamento(LoginRequiredMixin, View):
+class DetalhePagamento(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'pagamentos.view_pagamento'
     """
     View baseada em classe para exibir detalhes de um pagamento específico.
     

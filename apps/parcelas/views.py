@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView
 from .models import Parcela
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
-class GerenciarParcela(LoginRequiredMixin, ListView):
+class GerenciarParcela(PermissionRequiredMixin, LoginRequiredMixin, ListView):
+    permission_required = 'parcelas.view_parcela'
     """
     View baseada em classe para listar todos os parcelas cadastrados.
     
@@ -27,7 +27,8 @@ class GerenciarParcela(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Parcela.objects.filter(is_active=True).order_by('cliente')
     
-class CriarParcela(LoginRequiredMixin, CreateView):
+class CriarParcela(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = 'parcelas.add_parcela'
     """
     View baseada em classe para criação de novos parcelas.
     
@@ -63,7 +64,8 @@ class CriarParcela(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
     
-class EditarParcela(LoginRequiredMixin, UpdateView):
+class EditarParcela(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'parcelas.change_parcela'
     """
     View baseada em classe para edição de parcelas existentes.
     
@@ -99,7 +101,8 @@ class EditarParcela(LoginRequiredMixin, UpdateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
-class CancelarParcela(LoginRequiredMixin, View):
+class CancelarParcela(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'parcelas.change_parcela'
     """
     View baseada em classe para cancelar (desativar) parcelas.
     
@@ -127,7 +130,8 @@ class CancelarParcela(LoginRequiredMixin, View):
         parcela.save()
         return redirect('lista_parcelas')
     
-class ReativarParcela(LoginRequiredMixin, View):
+class ReativarParcela(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'parcelas.change_parcela'
     """
     View baseada em classe para reativar parcelas canceladas.
     
@@ -155,7 +159,8 @@ class ReativarParcela(LoginRequiredMixin, View):
         parcela.save()
         return redirect('lista_parcelas')
     
-class DetalheParcela(LoginRequiredMixin, View):
+class DetalheParcela(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'parcelas.view_parcela'
     """
     View baseada em classe para exibir detalhes de uma parcela específica.
     

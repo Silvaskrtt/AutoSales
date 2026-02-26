@@ -1,11 +1,12 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views import View
 from django.urls import reverse_lazy
 from .models import Venda
 
-class GerenciarVenda(LoginRequiredMixin, ListView):
+class GerenciarVenda(PermissionRequiredMixin, LoginRequiredMixin, ListView):
+    permission_required = 'vendas.view_venda'
     """
     View baseada em classe para listar todas as vendas cadastradas.
     
@@ -26,7 +27,8 @@ class GerenciarVenda(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Venda.objects.filter(is_active=True).order_by('-data_venda')
     
-class CriarVenda(LoginRequiredMixin, CreateView):
+class CriarVenda(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = 'vendas.add_venda'
     """
     View baseada em classe para criação de novas vendas.
     
@@ -62,7 +64,8 @@ class CriarVenda(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
     
-class DetalhesVenda(LoginRequiredMixin, View):
+class DetalhesVenda(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'vendas.view_venda'
     """
     View baseada em classe para exibir os detalhes de uma venda específica.
     
@@ -76,7 +79,8 @@ class DetalhesVenda(LoginRequiredMixin, View):
         venda = get_object_or_404(Venda, pk=pk, user=request.user)
         return render(request, 'vendas/detalhes.html', {'venda': venda})
 
-class EditarVenda(LoginRequiredMixin, UpdateView):
+class EditarVenda(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'vendas.change_venda'
     """
     View baseada em classe para edição de vendas existentes.
     
@@ -94,7 +98,8 @@ class EditarVenda(LoginRequiredMixin, UpdateView):
     template_name = 'vendas/modal_edit.html'
     success_url = reverse_lazy('lista_vendas')
     
-class CancelarVenda(LoginRequiredMixin, View):
+class CancelarVenda(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'vendas.change_venda'
     """
     View baseada em classe para cancelar (desativar) vendas.
     

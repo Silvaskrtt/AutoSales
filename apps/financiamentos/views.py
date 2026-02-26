@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView
 
@@ -7,7 +7,8 @@ from .models import Financiamento
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
-class GerenciarFinanciamento(LoginRequiredMixin, ListView):
+class GerenciarFinanciamento(PermissionRequiredMixin, LoginRequiredMixin, ListView):
+    permission_required = 'financiamentos.view_financiamento'
     """
     View baseada em classe para listar todos os financiamentos cadastrados.
     
@@ -28,7 +29,8 @@ class GerenciarFinanciamento(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Financiamento.objects.filter(user=self.request.user).order_by('instituicao_financeira')
         
-class CriarFinanciamento(LoginRequiredMixin, CreateView):
+class CriarFinanciamento(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = 'financiamentos.add_financiamento'
     """
     View baseada em classe para criação de novos financiamentos.
     
@@ -64,7 +66,8 @@ class CriarFinanciamento(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
     
-class EditarFinanciamento(LoginRequiredMixin, UpdateView):
+class EditarFinanciamento(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'financiamentos.change_financiamento'
     """
     View baseada em classe para edição de financiamentos existentes.
     
@@ -82,7 +85,8 @@ class EditarFinanciamento(LoginRequiredMixin, UpdateView):
     template_name = 'financiamentos/modal_edit.html'
     success_url = reverse_lazy('lista_financiamentos')
     
-class DesativarFinanciamento(LoginRequiredMixin, View):
+class DesativarFinanciamento(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'financiamentos.change_financiamento'
     """
     View baseada em classe para desativar financiamentos.
     
@@ -109,7 +113,8 @@ class DesativarFinanciamento(LoginRequiredMixin, View):
         
         return redirect('lista_financiamentos')
     
-class ReativarFinanciamento(LoginRequiredMixin, View):
+class ReativarFinanciamento(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'financiamentos.change_financiamento'
     """
     View baseada em classe para reativar financiamentos desativados.
     
@@ -136,7 +141,8 @@ class ReativarFinanciamento(LoginRequiredMixin, View):
         
         return redirect('lista_financiamentos')
     
-class DetalheFinanciamento(LoginRequiredMixin, View):
+class DetalheFinanciamento(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'financiamentos.view_financiamento'
     """
     View baseada em classe para exibir detalhes de um financiamento específico.
     
