@@ -1,0 +1,12 @@
+{% extends 'base_with_sidebar.html' %}
+
+{% block content %}
+  <article>
+    <h1>{{ relatorio.title }}</h1>
+    <p>{{ relatorio.description|linebreaks }}</p>
+    {% if relatorio.file %}
+      <p><a href="{{ relatorio.file.url }}">Download do arquivo</a></p>
+    {% endif %}
+    <p><small>Criado: {{ relatorio.created_at }}</small></p>
+  </article>
+{% endblock %}
