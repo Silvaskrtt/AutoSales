@@ -56,6 +56,8 @@ class Veiculo(models.Model):
         default='DISPONIVEL'
     )
     
+    imagem_veiculo = models.ImageField(upload_to='veiculos/media/', null=True, blank=True)
+    
     is_active = models.BooleanField(default=True)
     
     modelo = models.ForeignKey(Modelo, on_delete=models.CASCADE)

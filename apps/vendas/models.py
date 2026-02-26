@@ -39,6 +39,17 @@ class Venda(models.Model):
         verbose_name="Tipo de Pagamento",
     )
     
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pendente', 'Pendente'),
+            ('concluida', 'Concluída'),
+            ('cancelada', 'Cancelada'),
+        ],
+        default='pendente',
+        verbose_name="Status da Venda",
+    )
+    
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE) # Vendedor responsável pela venda
     veiculo = models.ForeignKey(Veiculo, on_delete=models.CASCADE)

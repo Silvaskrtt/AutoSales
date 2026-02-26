@@ -49,24 +49,31 @@
                 </a>
             </li>
             
-            <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-                <a href="#" class="sidebar-nav-link">
+            <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'lista_clientes' %}active{% endif %}">
+                <a href="{% url 'lista_clientes' %}" class="sidebar-nav-link">
                     <span class="sidebar-nav-icon">👤</span>
-                    <span class="sidebar-nav-text">{% trans "Profile" %}</span>
+                    <span class="sidebar-nav-text">{% trans "Clientes" %}</span>
                 </a>
             </li>
             
-            <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'account_email' %}active{% endif %}">
-                <a href="{% url 'account_email' %}" class="sidebar-nav-link">
-                    <span class="sidebar-nav-icon">📧</span>
-                    <span class="sidebar-nav-text">{% trans "Emails" %}</span>
+            <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'lista_veiculos' %}active{% endif %}">
+                <a href="{% url 'lista_veiculos' %}" class="sidebar-nav-link">
+                    <span class="sidebar-nav-icon">🚗</span>
+                    <span class="sidebar-nav-text">{% trans "Veiculos" %}</span>
                 </a>
             </li>
             
-            <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'account_change_password' %}active{% endif %}">
-                <a href="{% url 'account_change_password' %}" class="sidebar-nav-link">
-                    <span class="sidebar-nav-icon">🔒</span>
-                    <span class="sidebar-nav-text">{% trans "Password" %}</span>
+            <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'marcas_list' %}active{% endif %}">
+                <a href="#" class="sidebar-nav-link">
+                    <span class="sidebar-nav-icon">🏭</span>
+                    <span class="sidebar-nav-text">{% trans "Marcas" %}</span>
+                </a>
+            </li>
+
+            <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'vendas_list' %}active{% endif %}">
+                <a href="#" class="sidebar-nav-link">
+                    <span class="sidebar-nav-icon">💰</span>
+                    <span class="sidebar-nav-text">{% trans "Vendas" %}</span>
                 </a>
             </li>
             

@@ -8,4 +8,5 @@ class VeiculoSerializer(serializers.ModelSerializer):
             'id', 'marca', 'modelo', 'ano', 'cor', 'preco',
             'is_active', 'user'
         ]
+        
         read_only_fields = ['id', 'user']
