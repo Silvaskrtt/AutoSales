@@ -1,14 +1,14 @@
 from django.db import models
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from datetime import date
-
+from config import settings
 from modelos.models import Modelo
 
 def current_year():
     return date.today().year
 
 class Veiculo(models.Model):
-    # TYPE_CHOICES feito para 'status'
+    # TYPE_CHOICES para 'status'
     TYPE_CHOICES = [
         ('DISPONIVEL', 'Disponível'),
         ('VENDIDO', 'Vendido'),
@@ -33,9 +33,9 @@ class Veiculo(models.Model):
     )
     
     ano = models.PositiveSmallIntegerField(
-        default=current_year(),
+        default=current_year,
         validators=[
-            MinValueValidator(1800),
+            MinValueValidator(1886),  # Primeiro automóvel
             MaxValueValidator(3000)
         ]
     )
@@ -56,11 +56,27 @@ class Veiculo(models.Model):
         default='DISPONIVEL'
     )
     
-    imagem_veiculo = models.ImageField(upload_to='veiculos/media/', null=True, blank=True)
+    imagem_veiculo = models.ImageField(upload_to='veiculos/', null=True, blank=True)
     
     is_active = models.BooleanField(default=True)
     
     modelo = models.ForeignKey(Modelo, on_delete=models.CASCADE)
     
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='veiculos', 
+        null=True, 
+        blank=True
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Veículo'
+        verbose_name_plural = 'Veículos'
+    
     def __str__(self):
-        return f"{self.modelo} - {self.placa} - {self.status}"
+        return f"{self.modelo} - {self.placa}"

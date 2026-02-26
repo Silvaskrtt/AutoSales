@@ -3,8 +3,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views import View
 from django.urls import reverse_lazy
+from modelos.models import Modelo
 from .models import Veiculo
-
+import json
 
 class GerenciarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     permission_required = 'veiculos.view_veiculo'
@@ -13,12 +14,6 @@ class GerenciarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     
     Requer que o usuário esteja autenticado (LoginRequiredMixin).
     Lista os veículos ordenados alfabeticamente por modelo.
-    
-    Attributes:
-        model: Modelo Veiculo que será consultado
-        template_name: Template responsável pela renderização da lista
-        context_object_name: Nome da variável de contexto disponível no template
-        ordering: Critério de ordenação dos registros (por modelo)
     """
     model = Veiculo
     template_name = 'veiculos/list.html'
@@ -26,7 +21,28 @@ class GerenciarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     ordering = ['modelo']
     
     def get_queryset(self):
+        """Retorna apenas veículos ativos"""
         return Veiculo.objects.filter(is_active=True).order_by('modelo')
+    
+    def get_context_data(self, **kwargs):
+        """Adiciona modelos ao contexto para o select do formulário"""
+        context = super().get_context_data(**kwargs)
+        
+        # Buscar modelos ativos para o select
+        modelos = Modelo.objects.all().select_related('marca')
+        context['modelos'] = modelos
+        
+        # Serializar modelos para JavaScript (para uso no frontend)
+        modelos_data = [
+            {
+                'id': m.id,
+                'nome': m.nome,
+                'marca_nome': m.marca.nome
+            } for m in modelos
+        ]
+        context['modelos_json'] = json.dumps(modelos_data)
+        
+        return context
     
 class CriarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = 'veiculos.add_veiculo'

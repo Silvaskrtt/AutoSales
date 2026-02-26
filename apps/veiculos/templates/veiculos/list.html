@@ -1,267 +1,217 @@
-{% extends 'base.html' %}
+{% extends "base_with_sidebar.html" %}
 {% load static %}
 
+{% block title %}Gestão de Veículos{% endblock %}
+
 {% block content %}
+<!-- CSRF Token e Meta tags -->
+{% csrf_token %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+
 <!-- Header -->
-<header class="header">
-    <div class="container">
-        <div class="header-content">
-            <div class="flex items-center gap-4">
-                <div class="logo">
-                    <svg width="32" height="32" viewbox="0 0 24 24" fill="none" stroke="currentColor">
+<header class="text-center mb-8">
+    <h1 id="page-title" class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-300 bg-clip-text text-transparent mb-2">Veículos</h1>
+    <p id="page-subtitle" class="text-slate-400 text-lg">Gerenciamento de veículos cadastrados</p>
+</header>
+
+<!-- Form Card -->
+<div class="glass-card rounded-3xl p-6 md:p-8 mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <h2 id="form-title" class="text-xl font-semibold text-cyan-300 flex items-center gap-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span id="form-title-text">Cadastrar Novo Veículo</span>
+        </h2>
+        <button id="cancel-btn" onclick="cancelEdit()" class="neon-btn-outline px-4 py-2 rounded-xl text-sm font-medium hidden">Cancelar</button>
+    </div>
+    
+    <form id="veiculo-form" onsubmit="handleSubmit(event)">
+        <!-- Campo CSRF hidden para o formulário (adicional) -->
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <!-- Modelo (ForeignKey) -->
+            <div class="relative md:col-span-2 lg:col-span-1">
+                <label class="block text-xs text-slate-400 mb-1.5 ml-1">Modelo</label>
+                <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
                     </svg>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-gradient">Vehicle Inventory</h1>
-                    <p class="text-sm text-tertiary" id="vehicle-count">0 vehicles</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-                    <svg id="sun-icon" class="sun-icon hidden" width="20" height="20" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                    <svg id="moon-icon" class="moon-icon block" width="20" height="20" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                    </svg>
-                </button>
-                
-                <button id="add-vehicle-btn" class="btn btn-primary">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>Add Vehicle</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</header>
-
-<main class="container py-6">
-    <!-- Filters -->
-    <div class="filter-group" role="tablist" aria-label="Filter vehicles by status">
-        <button data-filter="all" class="filter-btn active" role="tab" aria-selected="true">All</button>
-        <button data-filter="available" class="filter-btn" role="tab" aria-selected="false">Available</button>
-        <button data-filter="reserved" class="filter-btn" role="tab" aria-selected="false">Reserved</button>
-        <button data-filter="sold" class="filter-btn" role="tab" aria-selected="false">Sold</button>
-    </div>
-
-    <!-- Vehicle Grid -->
-    <div id="vehicle-grid" class="grid grid-auto-fit"></div>
-
-    <!-- Empty State -->
-    <div id="empty-state" class="empty-state hidden">
-        <div class="empty-state-icon">
-            <svg width="48" height="48" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M13 16a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1" />
-            </svg>
-        </div>
-        <h3 class="empty-state-title">No vehicles yet</h3>
-        <p class="empty-state-text">Add your first vehicle to get started</p>
-        <button class="btn btn-primary" onclick="openAddModal()">Add Vehicle</button>
-    </div>
-
-    <!-- Limit Warning -->
-    <div id="limit-warning" class="toast toast-warning hidden">
-        ⚠️ Maximum limit of 999 vehicles reached. Please delete some vehicles to add more.
-    </div>
-</main>
-
-<!-- Add/Edit Modal -->
-<div id="modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 id="modal-title" class="modal-title">Add New Vehicle</h2>
-            <button id="close-modal-btn" class="modal-close" onclick="closeModal()">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        
-        <div class="modal-body">
-            <form id="vehicle-form">
-                <input type="hidden" id="vehicle-id">
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label for="brand" class="form-label">Brand</label>
-                        <input type="text" id="brand" required class="input-field" placeholder="Toyota">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="model" class="form-label">Model</label>
-                        <input type="text" id="model" required class="input-field" placeholder="Camry">
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label for="year" class="form-label">Year</label>
-                        <input type="number" id="year" required min="1900" max="2030" class="input-field" placeholder="2024">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="price" class="form-label">Price ($)</label>
-                        <input type="number" id="price" required min="0" class="input-field" placeholder="25000">
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label for="color" class="form-label">Color</label>
-                        <input type="text" id="color" required class="input-field" placeholder="Silver">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="mileage" class="form-label">Mileage</label>
-                        <input type="number" id="mileage" required min="0" class="input-field" placeholder="15000">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="status" class="form-label">Status</label>
-                    <select id="status" required class="select-field">
-                        <option value="available">Available</option>
-                        <option value="reserved">Reserved</option>
-                        <option value="sold">Sold</option>
+                    <select name="modelo" id="modelo" required class="glass-input w-full pl-10 pr-4 py-3 rounded-xl text-white appearance-none cursor-pointer">
+                        <option value="">Selecione um modelo</option>
+                        {% for modelo in modelos %}
+                        <option value="{{ modelo.id }}">{{ modelo.nome }} - {{ modelo.marca.nome }}</option>
+                        {% endfor %}
                     </select>
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
                 </div>
-            </form>
+            </div>
+            
+            <!-- Placa -->
+            <div class="relative">
+                <label class="block text-xs text-slate-400 mb-1.5 ml-1">Placa</label>
+                <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                    <input type="text" name="placa" id="placa" placeholder="AAA1A23 ou AAA-1234" required 
+                           class="glass-input w-full pl-10 pr-4 py-3 rounded-xl text-white placeholder-slate-500 uppercase"
+                           oninput="formatPlaca(this)" maxlength="8">
+                </div>
+                <p class="text-xs text-slate-500 mt-1 ml-1">Formato: AAA1A23 (Mercosul) ou AAA-1234 (Antigo)</p>
+            </div>
+            
+            <!-- Ano -->
+            <div class="relative">
+                <label class="block text-xs text-slate-400 mb-1.5 ml-1">Ano</label>
+                <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <input type="number" name="ano" id="ano" placeholder="2024" required 
+                           class="glass-input w-full pl-10 pr-4 py-3 rounded-xl text-white placeholder-slate-500"
+                           min="1800" max="3000" value="2024">
+                </div>
+            </div>
+            
+            <!-- Cor -->
+            <div class="relative">
+                <label class="block text-xs text-slate-400 mb-1.5 ml-1">Cor</label>
+                <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                    <input type="text" name="cor" id="cor" placeholder="Digite a cor" required 
+                           class="glass-input w-full pl-10 pr-4 py-3 rounded-xl text-white placeholder-slate-500">
+                </div>
+            </div>
+            
+            <!-- Preço -->
+            <div class="relative">
+                <label class="block text-xs text-slate-400 mb-1.5 ml-1">Preço (R$)</label>
+                <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <input type="number" name="preco" id="preco" placeholder="50000.00" required 
+                           class="glass-input w-full pl-10 pr-4 py-3 rounded-xl text-white placeholder-slate-500"
+                           step="0.01" min="0">
+                </div>
+            </div>
+            
+            <!-- Status -->
+            <div class="relative">
+                <label class="block text-xs text-slate-400 mb-1.5 ml-1">Status</label>
+                <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <select name="status" id="status" class="glass-input w-full pl-10 pr-4 py-3 rounded-xl text-white appearance-none cursor-pointer">
+                        <option value="DISPONIVEL">Disponível</option>
+                        <option value="VENDIDO">Vendido</option>
+                        <option value="RESERVADO">Reservado</option>
+                        <option value="MANUTENCAO">Manutenção</option>
+                    </select>
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Imagem (Upload) -->
+            <div class="relative md:col-span-2 lg:col-span-3">
+                <label class="block text-xs text-slate-400 mb-1.5 ml-1">Imagem do Veículo</label>
+                <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <input type="file" name="imagem_veiculo" id="imagem_veiculo" accept="image/*"
+                           class="glass-input w-full pl-10 pr-4 py-3 rounded-xl text-white placeholder-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/20 file:text-cyan-400 hover:file:bg-cyan-500/30">
+                </div>
+                <div id="image-preview" class="hidden mt-3 relative inline-block">
+                    <img src="" alt="Preview" class="h-20 w-20 object-cover rounded-lg border-2 border-cyan-500/30">
+                    <button type="button" onclick="clearImagePreview()" class="absolute -top-2 -right-2 bg-red-500/20 text-red-400 rounded-full p-1 hover:bg-red-500/30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
         
-        <div class="modal-footer">
-            <button type="button" id="cancel-btn" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button type="submit" form="vehicle-form" id="submit-btn" class="btn btn-primary">
-                <span id="submit-text">Add Vehicle</span>
-                <span id="submit-loading" class="hidden">
-                    <svg class="spinner animate-spin" width="20" height="20" viewbox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                </span>
+        <!-- Submit Button -->
+        <div class="flex flex-wrap gap-3 justify-end">
+            <button type="submit" id="submit-btn" class="neon-btn px-6 py-3 rounded-xl font-semibold text-slate-900 flex items-center gap-2">
+                <svg id="submit-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span id="submit-text">Salvar Veículo</span>
             </button>
         </div>
+    </form>
+</div>
+
+<!-- Table Card -->
+<div class="glass-card rounded-3xl p-6 md:p-8">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-cyan-300 flex items-center gap-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Lista de Veículos
+        </h2>
+        <span id="veiculo-count" class="text-sm text-slate-400">0 veículos</span>
+    </div>
+    
+    <!-- Table Container -->
+    <div class="overflow-x-auto rounded-2xl">
+        <table class="w-full glass-table rounded-2xl overflow-hidden">
+            <thead>
+                <tr class="bg-slate-800/50 text-left">
+                    <th class="px-4 py-4 text-xs font-semibold text-cyan-300 uppercase tracking-wider">Imagem</th>
+                    <th class="px-4 py-4 text-xs font-semibold text-cyan-300 uppercase tracking-wider">Modelo/Marca</th>
+                    <th class="px-4 py-4 text-xs font-semibold text-cyan-300 uppercase tracking-wider">Placa</th>
+                    <th class="px-4 py-4 text-xs font-semibold text-cyan-300 uppercase tracking-wider hidden md:table-cell">Ano/Cor</th>
+                    <th class="px-4 py-4 text-xs font-semibold text-cyan-300 uppercase tracking-wider hidden lg:table-cell">Preço</th>
+                    <th class="px-4 py-4 text-xs font-semibold text-cyan-300 uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-4 text-xs font-semibold text-cyan-300 uppercase tracking-wider">Ativo</th>
+                    <th class="px-4 py-4 text-xs font-semibold text-cyan-300 uppercase tracking-wider text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="veiculos-table">
+                <tr>
+                    <td colspan="8" class="px-4 py-12 text-center text-slate-500">
+                        <div class="flex flex-col items-center gap-2">
+                            <svg class="w-12 h-12 text-slate-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            <span>Nenhum veículo cadastrado</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Limit Warning -->
+    <div id="limit-warning" class="hidden mt-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm">
+        ⚠️ Limite de 999 veículos atingido. Exclua alguns veículos para adicionar novos.
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div id="delete-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-    <div class="modal modal-sm">
-        <div class="modal-body text-center">
-            <div class="empty-state-icon mx-auto mb-4">
-                <svg width="48" height="48" fill="none" stroke="currentColor" viewbox="0 0 24 24" class="text-error-500">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-            </div>
-            
-            <h3 class="text-xl font-bold mb-2">Delete Vehicle?</h3>
-            <p class="text-secondary mb-6">This action cannot be undone.</p>
-            
-            <div class="flex gap-3 justify-center">
-                <button id="cancel-delete-btn" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-                <button id="confirm-delete-btn" class="btn btn-primary bg-gradient-error">
-                    <span id="delete-text">Delete</span>
-                    <span id="delete-loading" class="hidden">
-                        <svg class="spinner animate-spin" width="20" height="20" viewbox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Toast Container -->
+<div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
 
-<!-- Toast -->
-<div id="toast" class="toast hidden">
-    <div class="toast-content">
-        <span id="toast-message"></span>
-    </div>
-</div>
+{% endblock %}  <!-- FIM DO BLOCK CONTENT -->
 
+{% block extra_js %}
+<script src="{% static 'veiculos/js/veiculos.js' %}"></script>
 <script>
-    // Theme Toggle functionality
-    const themeToggle = document.getElementById('theme-toggle');
-    const appTheme = document.getElementById('app-theme');
-    const sunIcon = document.getElementById('sun-icon');
-    const moonIcon = document.getElementById('moon-icon');
-    
-    themeToggle.addEventListener('click', () => {
-        if (appTheme.classList.contains('light-mode')) {
-            appTheme.classList.remove('light-mode');
-            appTheme.classList.add('dark-mode');
-            sunIcon.classList.remove('hidden');
-            moonIcon.classList.add('hidden');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            appTheme.classList.remove('dark-mode');
-            appTheme.classList.add('light-mode');
-            sunIcon.classList.add('hidden');
-            moonIcon.classList.remove('hidden');
-            localStorage.setItem('theme', 'light');
-        }
-    });
-    
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    if (savedTheme === 'dark') {
-        appTheme.classList.remove('light-mode');
-        appTheme.classList.add('dark-mode');
-        sunIcon.classList.remove('hidden');
-        moonIcon.classList.add('hidden');
-    }
-
-    // Modal functions
-    function openAddModal() {
-        document.getElementById('modal').classList.remove('hidden');
-        document.getElementById('modal-title').textContent = 'Add New Vehicle';
-        document.getElementById('submit-text').textContent = 'Add Vehicle';
-        document.getElementById('vehicle-form').reset();
-        document.getElementById('vehicle-id').value = '';
-    }
-
-    function closeModal() {
-        document.getElementById('modal').classList.add('hidden');
-    }
-
-    function closeDeleteModal() {
-        document.getElementById('delete-modal').classList.add('hidden');
-    }
-
-    // Close modals when clicking outside
-    document.getElementById('modal')?.addEventListener('click', function(e) {
-        if (e.target === this) closeModal();
-    });
-
-    document.getElementById('delete-modal')?.addEventListener('click', function(e) {
-        if (e.target === this) closeDeleteModal();
-    });
-
-    // Filter functionality
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.filter-btn').forEach(b => {
-                b.classList.remove('active');
-                b.setAttribute('aria-selected', 'false');
-            });
-            this.classList.add('active');
-            this.setAttribute('aria-selected', 'true');
-            // Filter vehicles logic here
-            const filter = this.dataset.filter;
-            filterVehicles(filter);
-        });
-    });
-
-    function filterVehicles(filter) {
-        // Implement vehicle filtering logic
-        console.log('Filtering:', filter);
-    }
+    // Passar dados do Django para o JavaScript
+    window.modelosList = {{ modelos_json|safe }};
 </script>
-
-<script src="{% static 'js/veiculos.js' %}"></script>
 {% endblock %}
