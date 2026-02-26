@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'relatorios',
     'veiculos',
     'vendas',
+    'dashboards',
     
     # django-allauth
     'accounts',
@@ -205,6 +206,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+# Media (uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

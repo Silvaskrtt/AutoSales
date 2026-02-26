@@ -25,6 +25,11 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')), # Login, logout, signup, etc.
     
     # URLs das apps
+    # Dashboards na raiz
+    path('', include('dashboards.urls')),
+
+    # Outras apps (mantêm seus prefixes)
     path('', include('clientes.urls')),
     path('', include('veiculos.urls')),
+    path('', include('relatorios.urls')),
 ]
