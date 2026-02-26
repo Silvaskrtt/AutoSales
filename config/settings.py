@@ -121,6 +121,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # Audit middleware must come after AuthenticationMiddleware so request.user is available
+    'auditoria.middleware.AuditMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
@@ -229,4 +231,61 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
+}
+
+# Apps to audit (used by auditoria.signals)
+AUDIT_LOG_MODELS_APPS = [
+    'clientes', 'veiculos', 'vendas', 'pagamentos', 'financiamentos', 'parcelas', 'relatorios', 'dashboards'
+]
+
+# Logging configuration: basic file logger for system and audit
+LOGFILE_DIR = BASE_DIR / 'logfile'
+try:
+    if LOGFILE_DIR.exists() and not LOGFILE_DIR.is_dir():
+        # se existir como arquivo, usar fallback 'logs/'
+        LOGFILE_DIR = BASE_DIR / 'logs'
+    LOGFILE_DIR.mkdir(parents=True, exist_ok=True)
+except Exception:
+    LOGFILE_DIR = BASE_DIR / 'logs'
+    try:
+        LOGFILE_DIR.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        # último recurso: usar BASE_DIR
+        LOGFILE_DIR = BASE_DIR
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'audit_file': {
+            'class': 'logging.FileHandler',
+            'filename': str(LOGFILE_DIR / 'audit.log'),
+            'formatter': 'verbose',
+        },
+        'app_file': {
+            'class': 'logging.FileHandler',
+            'filename': str(LOGFILE_DIR / 'app.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'app_file'],
+            'level': 'INFO',
+        },
+        'audit': {
+            'handlers': ['audit_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    }
 }
