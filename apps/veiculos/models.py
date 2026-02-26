@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from datetime import date
-from config import settings
+from django.conf import settings
 from modelos.models import Modelo
 
 def current_year():
@@ -20,13 +20,13 @@ class Veiculo(models.Model):
     # 1. Padrao antigo: AAA-1234
     # 2. Padrao Mercosul: AAA1A23 (três letras, um número, uma letra, dois números)
     placa_validator = RegexValidator(
-        regex='^[A-Z]{3}\d[A-J0-9]\d{2}$',
+        regex='^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$|^[A-Z]{3}-[0-9]{4}$',
         message='Placa inválida. Use o formato AAA1A23 (Mercosul) ou AAA-1234 (Antigo).',
-        code='placa_invalida' 
+        code='placa_invalida'
     )
     
     placa = models.CharField(
-        max_length=8, # 'AAA-1234' tem 8 caracteres, 'AAA1A23' tem 7
+        max_length=8,
         validators=[placa_validator],
         unique=True,
         help_text="Formato: AAA1A23 ou AAA-1234"

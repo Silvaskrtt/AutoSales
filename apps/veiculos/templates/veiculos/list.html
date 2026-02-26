@@ -23,10 +23,10 @@
             </svg>
             <span id="form-title-text">Cadastrar Novo Veículo</span>
         </h2>
-        <button id="cancel-btn" onclick="cancelEdit()" class="neon-btn-outline px-4 py-2 rounded-xl text-sm font-medium hidden">Cancelar</button>
+        <button id="cancel-btn" onclick="veiculoCancelEdit()" class="neon-btn-outline px-4 py-2 rounded-xl text-sm font-medium hidden">Cancelar</button>
     </div>
     
-    <form id="veiculo-form" onsubmit="handleSubmit(event)">
+    <form id="veiculo-form" onsubmit="veiculoHandleSubmit(event)">
         <!-- Campo CSRF hidden para o formulário (adicional) -->
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         

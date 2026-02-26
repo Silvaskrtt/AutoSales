@@ -19,7 +19,7 @@ class VeiculoViewSet(viewsets.ModelViewSet):
             return Veiculo.objects.all()
         
         # Usuários normais veem apenas seus próprios veículos
-        return Veiculo.objects.filter(Q(user=user) | Q(user__isnull=True))
+        return Veiculo.objects.filter(user=user)
     
     def perform_create(self, serializer):
         """Associa o usuário autenticado ao criar o veículo"""

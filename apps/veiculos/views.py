@@ -62,9 +62,13 @@ class CriarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         form_valid: Sobrescrito para associar o usuário logado ao veículo antes de salvar
     """
     model = Veiculo
-    fields = ['marca', 'modelo', 'ano', 'preco', 'descricao']
+    fields = ['placa', 'modelo', 'ano', 'cor', 'preco', 'status', 'imagem_veiculo']
     template_name = 'veiculos/modal_form.html'
     success_url = reverse_lazy('lista_veiculos')
+    
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
     
 class EditarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     permission_required = 'veiculos.change_veiculo'

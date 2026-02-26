@@ -1,12 +1,12 @@
 // veiculos/static/veiculos/js/veiculos.js
 
-// Estado da aplicação
-let veiculos = [];
-let editingVeiculo = null;
-let pendingDeleteId = null;
+// Estado da aplicação - com prefixo veiculo para evitar conflitos
+let veiculosList = [];
+let veiculoEditing = null;
+let veiculoPendingDeleteId = null;
 
 // Configuração da API
-const API_BASE_URL = '/api/veiculos/';
+const VEICULOS_API_URL = '/api/veiculos/';
 
 // Utilitários de Formatação
 function formatPlaca(input) {
@@ -42,9 +42,9 @@ function formatCurrency(value) {
 // Funções de API
 async function fetchVeiculos() {
     try {
-        console.log('Buscando veículos de:', API_BASE_URL);
+        console.log('Buscando veículos de:', VEICULOS_API_URL);
         
-        const response = await fetch(API_BASE_URL, {
+        const response = await fetch(VEICULOS_API_URL, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -63,8 +63,8 @@ async function fetchVeiculos() {
         const data = await response.json();
         console.log('Dados recebidos:', data);
         
-        veiculos = Array.isArray(data) ? data : [];
-        console.log('Veículos processados:', veiculos);
+        veiculosList = Array.isArray(data) ? data : [];
+        console.log('Veículos processados:', veiculosList);
         
         renderTable();
         updateVeiculoCount();
@@ -72,7 +72,7 @@ async function fetchVeiculos() {
     } catch (error) {
         console.error('Erro detalhado ao carregar veículos:', error);
         showToast('Erro ao carregar veículos: ' + error.message, 'error');
-        veiculos = [];
+        veiculosList = [];
         renderTable();
     }
 }
@@ -83,13 +83,25 @@ async function createVeiculo(veiculoData) {
         
         // Criar FormData para enviar arquivo
         const formData = new FormData();
-        for (let key in veiculoData) {
+        
+        // Adicionar campos ao FormData
+        Object.keys(veiculoData).forEach(key => {
             if (veiculoData[key] !== null && veiculoData[key] !== undefined) {
-                formData.append(key, veiculoData[key]);
+                // Tratar números para evitar problemas de formatação
+                if (key === 'ano' || key === 'preco') {
+                    formData.append(key, veiculoData[key].toString());
+                } else {
+                    formData.append(key, veiculoData[key]);
+                }
             }
+        });
+
+        // Log do FormData para debugging
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
         }
 
-        const response = await fetch(API_BASE_URL, {
+        const response = await fetch(VEICULOS_API_URL, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
@@ -103,11 +115,11 @@ async function createVeiculo(veiculoData) {
             const newVeiculo = await response.json();
             console.log('Veículo criado:', newVeiculo);
             
-            if (!Array.isArray(veiculos)) {
-                veiculos = [];
+            if (!Array.isArray(veiculosList)) {
+                veiculosList = [];
             }
             
-            veiculos.push(newVeiculo);
+            veiculosList.push(newVeiculo);
             
             renderTable();
             updateVeiculoCount();
@@ -116,27 +128,53 @@ async function createVeiculo(veiculoData) {
         } else {
             const errorData = await response.json();
             console.error('Erro detalhado:', errorData);
-            showToast('Erro ao salvar veículo', 'error');
+            
+            // Extrair mensagens de erro detalhadas
+            let errorMessage = 'Erro ao salvar veículo';
+            if (errorData && typeof errorData === 'object') {
+                if (errorData.placa) {
+                    errorMessage = `Erro na placa: ${errorData.placa}`;
+                } else if (errorData.ano) {
+                    errorMessage = `Erro no ano: ${errorData.ano}`;
+                } else if (errorData.preco) {
+                    errorMessage = `Erro no preço: ${errorData.preco}`;
+                } else if (errorData.modelo) {
+                    errorMessage = `Erro no modelo: ${errorData.modelo}`;
+                } else if (errorData.non_field_errors) {
+                    errorMessage = errorData.non_field_errors[0];
+                }
+            }
+            
+            showToast(errorMessage, 'error');
             return { isOk: false, error: errorData };
         }
     } catch (error) {
         console.error('Erro completo:', error);
-        showToast('Erro ao salvar veículo', 'error');
+        showToast('Erro ao salvar veículo: ' + error.message, 'error');
         return { isOk: false, error };
     }
 }
 
 async function updateVeiculo(veiculoData) {
     try {
+        console.log('Atualizando veículo:', veiculoData);
+        
         // Criar FormData para enviar arquivo
         const formData = new FormData();
-        for (let key in veiculoData) {
+        
+        // Adicionar campos ao FormData
+        Object.keys(veiculoData).forEach(key => {
             if (veiculoData[key] !== null && veiculoData[key] !== undefined) {
-                formData.append(key, veiculoData[key]);
+                if (key === 'ano' || key === 'preco') {
+                    formData.append(key, veiculoData[key].toString());
+                } else {
+                    formData.append(key, veiculoData[key]);
+                }
             }
-        }
+        });
 
-        const response = await fetch(`${API_BASE_URL}${veiculoData.id}/`, {
+        // Importante: Para PUT, o Django REST framework espera todos os campos
+        const response = await fetch(`${VEICULOS_API_URL}${veiculoData.id}/`, {
             method: 'PUT',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
@@ -147,32 +185,46 @@ async function updateVeiculo(veiculoData) {
         if (response.ok) {
             const updatedVeiculo = await response.json();
             
-            if (!Array.isArray(veiculos)) {
-                veiculos = [];
+            if (!Array.isArray(veiculosList)) {
+                veiculosList = [];
             }
             
-            const index = veiculos.findIndex(v => v.id === updatedVeiculo.id);
+            const index = veiculosList.findIndex(v => v.id === updatedVeiculo.id);
             if (index !== -1) {
-                veiculos[index] = updatedVeiculo;
+                veiculosList[index] = updatedVeiculo;
             } else {
-                veiculos.push(updatedVeiculo);
+                veiculosList.push(updatedVeiculo);
             }
             
             renderTable();
             showToast('Veículo atualizado com sucesso!', 'success');
-            return { isOk: true };
+            return { isOk: true, data: updatedVeiculo };
+        } else {
+            const errorData = await response.json();
+            console.error('Erro detalhado:', errorData);
+            
+            let errorMessage = 'Erro ao atualizar veículo';
+            if (errorData && typeof errorData === 'object') {
+                if (errorData.placa) {
+                    errorMessage = `Erro na placa: ${errorData.placa}`;
+                } else if (errorData.ano) {
+                    errorMessage = `Erro no ano: ${errorData.ano}`;
+                }
+            }
+            
+            showToast(errorMessage, 'error');
+            return { isOk: false, error: errorData };
         }
-        throw new Error('Erro ao atualizar veículo');
     } catch (error) {
         console.error('Erro ao atualizar:', error);
-        showToast('Erro ao atualizar veículo', 'error');
+        showToast('Erro ao atualizar veículo: ' + error.message, 'error');
         return { isOk: false };
     }
 }
 
 async function deleteVeiculo(veiculoId) {
     try {
-        const response = await fetch(`${API_BASE_URL}${veiculoId}/`, {
+        const response = await fetch(`${VEICULOS_API_URL}${veiculoId}/`, {
             method: 'DELETE',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
@@ -180,10 +232,10 @@ async function deleteVeiculo(veiculoId) {
         });
         
         if (response.ok) {
-            if (Array.isArray(veiculos)) {
-                veiculos = veiculos.filter(v => v.id !== veiculoId);
+            if (Array.isArray(veiculosList)) {
+                veiculosList = veiculosList.filter(v => v.id !== veiculoId);
             } else {
-                veiculos = [];
+                veiculosList = [];
             }
             
             renderTable();
@@ -199,8 +251,8 @@ async function deleteVeiculo(veiculoId) {
     }
 }
 
-async function toggleVeiculoStatus(veiculoId, currentStatus) {
-    const veiculo = veiculos.find(v => v.id === veiculoId);
+async function toggleVeiculoStatus(veiculoId) {
+    const veiculo = veiculosList.find(v => v.id === veiculoId);
     
     if (veiculo) {
         veiculo.is_active = !veiculo.is_active;
@@ -239,7 +291,7 @@ function updateVeiculoCount() {
     const countEl = document.getElementById('veiculo-count');
     if (!countEl) return;
     
-    const count = veiculos.length;
+    const count = veiculosList.length;
     countEl.textContent = `${count} veículo${count !== 1 ? 's' : ''}`;
 }
 
@@ -247,7 +299,7 @@ function checkLimit() {
     const warning = document.getElementById('limit-warning');
     if (!warning) return;
     
-    if (veiculos.length >= 999) {
+    if (veiculosList.length >= 999) {
         warning.classList.remove('hidden');
     } else {
         warning.classList.add('hidden');
@@ -278,7 +330,7 @@ function renderTable() {
     const tbody = document.getElementById('veiculos-table');
     if (!tbody) return;
     
-    if (veiculos.length === 0) {
+    if (veiculosList.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="8" class="px-4 py-12 text-center text-slate-500">
@@ -294,9 +346,9 @@ function renderTable() {
         return;
     }
 
-    tbody.innerHTML = veiculos.map(veiculo => {
+    tbody.innerHTML = veiculosList.map(veiculo => {
         const isActive = veiculo.is_active;
-        const isPendingDelete = pendingDeleteId === veiculo.id;
+        const isPendingDelete = veiculoPendingDeleteId === veiculo.id;
         const imagemUrl = veiculo.imagem_veiculo ? veiculo.imagem_veiculo : '/static/veiculos/img/default-car.png';
         
         return `
@@ -321,7 +373,7 @@ function renderTable() {
                     </span>
                 </td>
                 <td class="px-4 py-4">
-                    <button onclick="window.toggleStatus(${veiculo.id})" 
+                    <button onclick="window.veiculoToggleStatus(${veiculo.id})" 
                         class="px-3 py-1.5 rounded-lg text-xs font-medium ${isActive ? 'status-active' : 'status-inactive'} cursor-pointer transition-all hover:scale-105">
                         ${isActive ? 'Ativo' : 'Inativo'}
                     </button>
@@ -329,14 +381,14 @@ function renderTable() {
                 <td class="px-4 py-4">
                     <div class="flex items-center justify-center gap-2">
                         ${isPendingDelete ? `
-                            <button onclick="window.confirmDelete(${veiculo.id})" 
+                            <button onclick="window.veiculoConfirmDelete(${veiculo.id})" 
                                 class="action-btn p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 delete-confirm"
                                 title="Confirmar exclusão">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </button>
-                            <button onclick="window.cancelDelete()" 
+                            <button onclick="window.veiculoCancelDelete()" 
                                 class="action-btn p-2 rounded-lg bg-slate-500/20 text-slate-400 hover:bg-slate-500/30"
                                 title="Cancelar">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,14 +396,14 @@ function renderTable() {
                                 </svg>
                             </button>
                         ` : `
-                            <button onclick="window.editVeiculo(${veiculo.id})" 
+                            <button onclick="window.veiculoEdit(${veiculo.id})" 
                                 class="action-btn p-2 rounded-lg bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30"
                                 title="Editar">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
                             </button>
-                            <button onclick="window.initiateDelete(${veiculo.id})" 
+                            <button onclick="window.veiculoInitiateDelete(${veiculo.id})" 
                                 class="action-btn p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
                                 title="Excluir">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -367,10 +419,10 @@ function renderTable() {
 }
 
 // Handlers de Ações
-async function handleSubmit(e) {
+async function veiculoHandleSubmit(e) {
     e.preventDefault();
     
-    if (veiculos.length >= 999 && !editingVeiculo) {
+    if (veiculosList.length >= 999 && !veiculoEditing) {
         showToast('Limite de 999 veículos atingido!', 'error');
         return;
     }
@@ -382,7 +434,7 @@ async function handleSubmit(e) {
     
     // Show loading state
     submitBtn.disabled = true;
-    submitText.textContent = editingVeiculo ? 'Atualizando...' : 'Salvando...';
+    submitText.textContent = veiculoEditing ? 'Atualizando...' : 'Salvando...';
     submitIcon.innerHTML = '<div class="loading-spinner w-5 h-5 rounded-full"></div>';
 
     // Criar objeto com os dados do formulário
@@ -393,7 +445,7 @@ async function handleSubmit(e) {
         cor: form.cor.value,
         preco: parseFloat(form.preco.value),
         status: form.status.value,
-        is_active: editingVeiculo ? editingVeiculo.is_active : true
+        is_active: veiculoEditing ? veiculoEditing.is_active : true
     };
 
     // Adicionar imagem se selecionada
@@ -403,8 +455,8 @@ async function handleSubmit(e) {
     }
 
     let result;
-    if (editingVeiculo) {
-        formData.id = editingVeiculo.id;
+    if (veiculoEditing) {
+        formData.id = veiculoEditing.id;
         result = await updateVeiculo(formData);
     } else {
         result = await createVeiculo(formData);
@@ -418,15 +470,15 @@ async function handleSubmit(e) {
     if (result.isOk) {
         form.reset();
         clearImagePreview();
-        cancelEdit();
+        veiculoCancelEdit();
     }
 }
 
-function editVeiculo(id) {
-    const veiculo = veiculos.find(v => v.id === id);
+function veiculoEdit(id) {
+    const veiculo = veiculosList.find(v => v.id === id);
     if (!veiculo) return;
 
-    editingVeiculo = veiculo;
+    veiculoEditing = veiculo;
     
     document.getElementById('modelo').value = veiculo.modelo || '';
     document.getElementById('placa').value = veiculo.placa || '';
@@ -450,8 +502,8 @@ function editVeiculo(id) {
     document.getElementById('veiculo-form').scrollIntoView({ behavior: 'smooth' });
 }
 
-function cancelEdit() {
-    editingVeiculo = null;
+function veiculoCancelEdit() {
+    veiculoEditing = null;
     document.getElementById('veiculo-form').reset();
     clearImagePreview();
     document.getElementById('form-title-text').textContent = 'Cadastrar Novo Veículo';
@@ -459,17 +511,17 @@ function cancelEdit() {
     document.getElementById('cancel-btn').classList.add('hidden');
 }
 
-function initiateDelete(id) {
-    pendingDeleteId = id;
+function veiculoInitiateDelete(id) {
+    veiculoPendingDeleteId = id;
     renderTable();
 }
 
-function cancelDelete() {
-    pendingDeleteId = null;
+function veiculoCancelDelete() {
+    veiculoPendingDeleteId = null;
     renderTable();
 }
 
-async function confirmDelete(id) {
+async function veiculoConfirmDelete(id) {
     const row = document.querySelector(`tr[data-id="${id}"]`);
     if (row) {
         row.style.opacity = '0.5';
@@ -478,18 +530,18 @@ async function confirmDelete(id) {
 
     const result = await deleteVeiculo(id);
     
-    pendingDeleteId = null;
+    veiculoPendingDeleteId = null;
     
-    if (result.isOk && editingVeiculo && editingVeiculo.id === id) {
-        cancelEdit();
+    if (result.isOk && veiculoEditing && veiculoEditing.id === id) {
+        veiculoCancelEdit();
     }
 }
 
-async function toggleStatus(id) {
-    const veiculo = veiculos.find(v => v.id === id);
+async function veiculoToggleStatus(id) {
+    const veiculo = veiculosList.find(v => v.id === id);
     if (!veiculo) return;
 
-    const result = await toggleVeiculoStatus(id, veiculo.is_active);
+    const result = await toggleVeiculoStatus(id);
     
     if (result && result.isOk) {
         showToast(`Veículo ${veiculo.is_active ? 'ativado' : 'desativado'}!`, 'info');
@@ -549,9 +601,9 @@ function getCookie(name) {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM carregado, inicializando...');
+    console.log('DOM carregado, inicializando app de veículos...');
     
-    veiculos = [];
+    veiculosList = [];
     
     fetchVeiculos();
     
@@ -563,16 +615,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Registrar funções no window com prefixo para evitar conflitos
     window.formatPlaca = formatPlaca;
     window.formatPreco = formatPreco;
-    window.handleSubmit = handleSubmit;
-    window.editVeiculo = editVeiculo;
-    window.cancelEdit = cancelEdit;
-    window.initiateDelete = initiateDelete;
-    window.cancelDelete = cancelDelete;
-    window.confirmDelete = confirmDelete;
-    window.toggleStatus = toggleStatus;
+    window.veiculoHandleSubmit = veiculoHandleSubmit;
+    window.veiculoEdit = veiculoEdit;
+    window.veiculoCancelEdit = veiculoCancelEdit;
+    window.veiculoInitiateDelete = veiculoInitiateDelete;
+    window.veiculoCancelDelete = veiculoCancelDelete;
+    window.veiculoConfirmDelete = veiculoConfirmDelete;
+    window.veiculoToggleStatus = veiculoToggleStatus;
     window.clearImagePreview = clearImagePreview;
     
-    console.log('Inicialização completa');
+    console.log('Inicialização do app de veículos completa');
 });

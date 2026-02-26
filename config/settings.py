@@ -121,10 +121,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # Enforce login for all views (exempt config in LOGIN_EXEMPT_URLS)
-    'accounts.middleware.LoginRequiredMiddleware',
 
-    # Audit middleware must come after AuthenticationMiddleware so request.user is available
+    # Audiroria personalizada para log de ações do usuário
     'auditoria.middleware.AuditMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -239,15 +237,6 @@ REST_FRAMEWORK = {
 # Apps to audit (used by auditoria.signals)
 AUDIT_LOG_MODELS_APPS = [
     'clientes', 'veiculos', 'vendas', 'pagamentos', 'financiamentos', 'parcelas', 'relatorios', 'dashboards'
-]
-
-# URLs regex patterns to exempt from login requirement (middleware)
-LOGIN_EXEMPT_URLS = [
-    r'^/accounts/',
-    r'^/admin/',
-    r'^/static/',
-    r'^/media/',
-    r'^/favicon.ico$',
 ]
 
 # Logging configuration: basic file logger for system and audit
