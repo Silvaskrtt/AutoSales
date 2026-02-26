@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView
 
-from apps.clientes.models import Cliente
 from .models import Financiamento
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
