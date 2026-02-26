@@ -1,0 +1,9 @@
+{% extends 'base_with_sidebar.html' %}
+
+{% block content %}
+  <article>
+    <h1>{{ dashboard.title }}</h1>
+    <p>{{ dashboard.description|linebreaks }}</p>
+    <p><small>Atualizado: {{ dashboard.updated_at }}</small></p>
+  </article>
+{% endblock %}

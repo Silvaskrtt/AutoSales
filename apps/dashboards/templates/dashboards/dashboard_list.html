@@ -1,0 +1,20 @@
+{% extends 'base_with_sidebar.html' %}
+
+{% block content %}
+  <h1>Dashboards</h1>
+  <ul>
+    {% for dash in dashboards %}
+      <li>
+        <a href="{{ dash.get_absolute_url }}">{{ dash.title }}</a>
+        {% if dash.owner %} — {{ dash.owner.get_full_name|default:dash.owner.username }}{% endif %}
+      </li>
+    {% empty %}
+      <li>Nenhum dashboard disponível.</li>
+    {% endfor %}
+  </ul>
+
+  {% if is_paginated %}
+    <div class="pagination">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Anterior</a>{% endif %} — Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }} {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Próxima</a>{% endif %}</div>
+  {% endif %}
+
+{% endblock %}
