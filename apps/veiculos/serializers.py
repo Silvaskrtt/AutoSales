@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Veiculo
 from datetime import date
-from modelos.models import Modelo
 import re
 
 class VeiculoSerializer(serializers.ModelSerializer):

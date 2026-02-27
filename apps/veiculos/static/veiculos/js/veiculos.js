@@ -42,7 +42,7 @@ function formatCurrency(value) {
 // Funções de API
 async function fetchVeiculos() {
     try {
-        console.log('Buscando veículos de:', VEICULOS_API_URL);
+        console.log('Atualizando veículos via API...');
         
         const response = await fetch(VEICULOS_API_URL, {
             headers: {
@@ -52,27 +52,28 @@ async function fetchVeiculos() {
             credentials: 'same-origin'
         });
         
-        console.log('Status da resposta:', response.status);
-        
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Resposta de erro:', errorText);
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            throw new Error(`HTTP ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Dados recebidos:', data);
         
-        veiculosList = Array.isArray(data) ? data : [];
-        console.log('Veículos processados:', veiculosList);
+        // Verificar se a resposta é paginada ou array direto
+        if (data && data.results && Array.isArray(data.results)) {
+            veiculosList = data.results;
+        } else if (Array.isArray(data)) {
+            veiculosList = data;
+        } else {
+            veiculosList = [];
+        }
         
+        console.log('Veículos atualizados via API:', veiculosList.length);
         renderTable();
         updateVeiculoCount();
         checkLimit();
     } catch (error) {
-        console.error('Erro detalhado ao carregar veículos:', error);
-        showToast('Erro ao carregar veículos: ' + error.message, 'error');
-        veiculosList = [];
+        console.error('Erro ao atualizar via API, usando dados iniciais:', error);
+        // Se a API falhar, mantém os dados iniciais do ListView
         renderTable();
     }
 }
@@ -603,8 +604,19 @@ function getCookie(name) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM carregado, inicializando app de veículos...');
     
-    veiculosList = [];
+    // Usar dados iniciais do ListView
+    if (window.initialVeiculos && Array.isArray(window.initialVeiculos)) {
+        veiculosList = window.initialVeiculos;
+        console.log('Dados iniciais carregados do ListView:', veiculosList.length);
+        renderTable();
+        updateVeiculoCount();
+        checkLimit();
+    } else {
+        veiculosList = [];
+        renderTable();
+    }
     
+    // Tentar atualizar via API (para ter dados mais recentes)
     fetchVeiculos();
     
     // Adicionar evento de preview de imagem
@@ -615,7 +627,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Registrar funções no window com prefixo para evitar conflitos
+    // Registrar funções no window
     window.formatPlaca = formatPlaca;
     window.formatPreco = formatPreco;
     window.veiculoHandleSubmit = veiculoHandleSubmit;

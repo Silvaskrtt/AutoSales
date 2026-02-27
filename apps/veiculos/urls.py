@@ -1,12 +1,7 @@
-from django.urls import path, include
-from .views import GerenciarVeiculo, CriarVeiculo, EditarVeiculo, DesativarVeiculo, DetalheVeiculo
-from rest_framework import routers
-from .api import VeiculoViewSet
-
-router = routers.DefaultRouter()
-router.register(r'api/veiculos', VeiculoViewSet, basename='api-veiculos')
+from django.urls import path
+from .views import GerenciarVeiculo
 
 urlpatterns = [
+    # View para renderizar o template
     path('veiculos/', GerenciarVeiculo.as_view(), name='lista_veiculos'),
-    path('', include(router.urls)),
 ]

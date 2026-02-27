@@ -42,21 +42,21 @@
     <!-- Navigation -->
     <nav class="sidebar-nav">
         <ul>
-            <li class="sidebar-nav-item {% if request.resolver_match.namespace == 'dashboards' and request.resolver_match.url_name == 'list' %}active{% endif %}">
+            <li class="sidebar-nav-item {% if request.resolver_match.namespace == 'dashboards' %}active{% endif %}">
                 <a href="{% url 'dashboards:list' %}" class="sidebar-nav-link">
                     <span class="sidebar-nav-icon">📊</span>
                     <span class="sidebar-nav-text">{% trans "Dashboards" %}</span>
                 </a>
             </li>
-
-            <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'lista_clientes' %}active{% endif %}">
+            
+            <li class="sidebar-nav-item {% if request.resolver_match.namespace == 'clientes' and request.resolver_match.url_name == 'lista_clientes' %}active{% endif %}">
                 <a href="{% url 'lista_clientes' %}" class="sidebar-nav-link">
                     <span class="sidebar-nav-icon">👤</span>
                     <span class="sidebar-nav-text">{% trans "Clientes" %}</span>
                 </a>
             </li>
 
-            <li class="sidebar-nav-item {% if request.resolver_match.url_name == 'lista_veiculos' %}active{% endif %}">
+            <li class="sidebar-nav-item {% if request.resolver_match.namespace == 'veiculos' and request.resolver_match.url_name == 'lista_veiculos' %}active{% endif %}">
                 <a href="{% url 'lista_veiculos' %}" class="sidebar-nav-link">
                     <span class="sidebar-nav-icon">🚗</span>
                     <span class="sidebar-nav-text">{% trans "Veículos" %}</span>
@@ -105,12 +105,13 @@
                 </a>
             </li>
 
-            <li class="sidebar-nav-item {% if request.resolver_match.namespace == 'relatorios' and request.resolver_match.url_name == 'list' %}active{% endif %}">
+            <li class="sidebar-nav-item {% if request.resolver_match.namespace == 'relatorios' and request.resolver_match.url_name == 'lista_relatorios' %}active{% endif %}">
                 <a href="#" class="sidebar-nav-link">
-                    <span class="sidebar-nav-icon">📊</span>
+                    <span class="sidebar-nav-icon">📈</span>
                     <span class="sidebar-nav-text">{% trans "Relatórios" %}</span>
                 </a>
             </li>
+
 
             {% if user.is_staff %}
             <li class="sidebar-nav-item {% if request.resolver_match.app_name == 'admin' %}active{% endif %}">

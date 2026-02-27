@@ -207,7 +207,7 @@
             </svg>
             Lista de Clientes
         </h2>
-        <span id="client-count" class="text-sm text-slate-400">0 clientes</span>
+        <span id="client-count" class="text-sm text-slate-400">{{ clientes|length }} clientes</span>
     </div>
     
     <!-- Table Container -->
@@ -225,16 +225,30 @@
                 </tr>
             </thead>
             <tbody id="clients-table">
-                <tr>
-                    <td colspan="7" class="px-4 py-12 text-center text-slate-500">
-                        <div class="flex flex-col items-center gap-2">
-                            <svg class="w-12 h-12 text-slate-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            <span>Nenhum cliente cadastrado</span>
-                        </div>
-                    </td>
-                </tr>
+                {% if clientes %}
+                    {% for cliente in clientes %}
+                        <tr>
+                            <td class="px-4 py-4">{{ cliente.nome }} {{ cliente.sobrenome }}</td>
+                            <td class="px-4 py-4">{{ cliente.cpf }}</td>
+                            <td class="px-4 py-4 hidden md:table-cell">{{ cliente.telefone }}</td>
+                            <td class="px-4 py-4 hidden lg:table-cell">{{ cliente.email }}</td>
+                            <td class="px-4 py-4 hidden xl:table-cell">{{ cliente.cidade }}/{{ cliente.estado }}</td>
+                            <td class="px-4 py-4">{% if cliente.is_active %}Ativo{% else %}Inativo{% endif %}</td>
+                            <td class="px-4 py-4 text-center">-</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="px-4 py-12 text-center text-slate-500">
+                            <div class="flex flex-col items-center gap-2">
+                                <svg class="w-12 h-12 text-slate-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span>Nenhum cliente cadastrado</span>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>

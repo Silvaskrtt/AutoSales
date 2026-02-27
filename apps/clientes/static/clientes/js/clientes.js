@@ -1,5 +1,3 @@
-// clientes/static/clientes/js/clientes.js
-
 // Estado da aplicação
 let clients = [];
 let editingClient = null;
@@ -39,34 +37,29 @@ async function fetchClients() {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            credentials: 'same-origin'  // Importante para enviar cookies
+            credentials: 'same-origin'
         });
         
-        console.log('URL base da API:', API_BASE_URL);
-        console.log('CSRF Token:', getCookie('csrftoken'));
         console.log('Status da resposta:', response.status);
         
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Resposta de erro:', errorText);
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            throw new Error(`HTTP ${response.status}`);
         }
         
         const data = await response.json();
         console.log('Dados recebidos:', data);
         
-        // Agora data será um array diretamente
         clients = Array.isArray(data) ? data : [];
-        console.log('Clientes processados:', clients);
+        console.log('Clientes processados:', clients.length);
         
         renderTable();
         updateClientCount();
         checkLimit();
     } catch (error) {
-        console.error('Erro detalhado ao carregar clientes:', error);
-        showToast('Erro ao carregar clientes: ' + error.message, 'error');
+        console.error('Erro ao carregar clientes:', error);
+        showToast('Erro ao carregar clientes', 'error');
         clients = [];
-        renderTable(); // Renderiza tabela vazia
+        renderTable();
     }
 }
 
@@ -103,12 +96,10 @@ async function createClient(clientData) {
             const newClient = await response.json();
             console.log('Cliente criado:', newClient);
             
-            // Garantir que clients é array
             if (!Array.isArray(clients)) {
                 clients = [];
             }
             
-            // Adicionar o novo cliente à lista
             clients.push(newClient);
             
             renderTable();
@@ -142,7 +133,6 @@ async function updateClient(clientData) {
         if (response.ok) {
             const updatedClient = await response.json();
             
-            // GARANTIR que clients é array
             if (!Array.isArray(clients)) {
                 clients = [];
             }
@@ -176,7 +166,6 @@ async function deleteClient(clientId) {
         });
         
         if (response.ok) {
-            // GARANTIR que clients é array
             if (Array.isArray(clients)) {
                 clients = clients.filter(c => c.id !== clientId);
             } else {
@@ -255,6 +244,8 @@ function checkLimit() {
 function renderTable() {
     const tbody = document.getElementById('clients-table');
     if (!tbody) return;
+    
+    console.log('Renderizando tabela com', clients.length, 'clientes');
     
     if (clients.length === 0) {
         tbody.innerHTML = `
@@ -347,7 +338,6 @@ async function handleSubmit(e) {
     const submitText = document.getElementById('submit-text');
     const submitIcon = document.getElementById('submit-icon');
     
-    // Show loading state
     submitBtn.disabled = true;
     submitText.textContent = editingClient ? 'Atualizando...' : 'Salvando...';
     submitIcon.innerHTML = '<div class="loading-spinner w-5 h-5 rounded-full"></div>';
@@ -374,7 +364,6 @@ async function handleSubmit(e) {
         result = await createClient(formData);
     }
 
-    // Reset button state
     submitBtn.disabled = false;
     submitText.textContent = 'Salvar Cliente';
     submitIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
@@ -451,7 +440,7 @@ async function toggleStatus(id) {
     
     if (result && result.isOk) {
         showToast(`Cliente ${client.is_active ? 'ativado' : 'desativado'}!`, 'info');
-        fetchClients(); // Recarrega a lista para garantir consistência
+        fetchClients();
     }
 }
 
@@ -462,7 +451,6 @@ function getCookie(name) {
         const cookies = document.cookie.split(';');
         for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
-            // Verifica se este cookie string começa com o nome desejado
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
@@ -470,7 +458,6 @@ function getCookie(name) {
         }
     }
     
-    // Se não encontrar no cookie, tenta pegar do meta tag (se existir)
     if (!cookieValue) {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
         if (csrfToken) {
@@ -485,13 +472,9 @@ function getCookie(name) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM carregado, inicializando...');
     
-    // Inicializar clients como array vazio
     clients = [];
-    
-    // Carregar clientes
     fetchClients();
     
-    // Expor funções globalmente
     window.formatCPF = formatCPF;
     window.formatPhone = formatPhone;
     window.handleSubmit = handleSubmit;

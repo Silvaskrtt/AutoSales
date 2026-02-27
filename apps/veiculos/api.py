@@ -1,10 +1,9 @@
 # veiculos/api.py
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Q
 from .models import Veiculo
-from .serializers import VeiculoSerializer
+from .serializers import VeiculoSerializer 
 
 class VeiculoViewSet(viewsets.ModelViewSet):
     """API para gerenciar veículos."""

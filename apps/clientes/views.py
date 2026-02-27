@@ -1,13 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView
 from clientes.models import Cliente
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
-class GerenciarCliente(PermissionRequiredMixin, LoginRequiredMixin, ListView):
-    permission_required = 'clientes.view_cliente'
+class GerenciarCliente(LoginRequiredMixin, ListView):
     """
     View baseada em classe para listar todos os clientes cadastrados.
     
@@ -26,10 +25,18 @@ class GerenciarCliente(PermissionRequiredMixin, LoginRequiredMixin, ListView):
     ordering = ['nome']
     
     def get_queryset(self):
-        return Cliente.objects.filter(is_active=True).order_by('nome')
+        # Retorna apenas clientes do usuário logado
+        return Cliente.objects.filter(
+            user=self.request.user, 
+            is_active=True
+        ).order_by('nome')
         
-class CriarCliente(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
-    permission_required = 'clientes.add_cliente'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_clientes'] = self.get_queryset().count()
+        return context
+        
+class CriarCliente(LoginRequiredMixin, CreateView):
     """
     View baseada em classe para criação de novos clientes.
     
@@ -51,6 +58,8 @@ class CriarCliente(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('lista_clientes')
     
     def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
         """
         Valida e processa o formulário de criação de cliente.
         
@@ -65,8 +74,7 @@ class CriarCliente(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
     
-class EditarCliente(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
-    permission_required = 'clientes.change_cliente'
+class EditarCliente(LoginRequiredMixin, UpdateView):
     """
     View baseada em classe para edição de clientes existentes.
     
@@ -84,8 +92,7 @@ class EditarCliente(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     template_name = 'clientes/modal_edit.html'
     success_url = reverse_lazy('lista_clientes')
     
-class DesativarCliente(PermissionRequiredMixin, LoginRequiredMixin, View):
-    permission_required = 'clientes.change_cliente'
+class DesativarCliente(LoginRequiredMixin, View):
     """
     View baseada em classe para desativar clientes.
     
@@ -112,8 +119,7 @@ class DesativarCliente(PermissionRequiredMixin, LoginRequiredMixin, View):
         
         return redirect('lista_clientes')
     
-class ReativarCliente(PermissionRequiredMixin, LoginRequiredMixin, View):
-    permission_required = 'clientes.change_cliente'
+class ReativarCliente(LoginRequiredMixin, View):
     """
     View baseada em classe para reativar clientes desativados.
     
@@ -140,8 +146,7 @@ class ReativarCliente(PermissionRequiredMixin, LoginRequiredMixin, View):
         
         return redirect('lista_clientes')
     
-class DetalheCliente(PermissionRequiredMixin, LoginRequiredMixin, View):
-    permission_required = 'clientes.view_cliente'
+class DetalheCliente(LoginRequiredMixin, View):
     """
     View baseada em classe para exibir detalhes de um cliente específico.
     

@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views import View
 from django.urls import reverse_lazy
@@ -7,8 +7,7 @@ from modelos.models import Modelo
 from .models import Veiculo
 import json
 
-class GerenciarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, ListView):
-    permission_required = 'veiculos.view_veiculo'
+class GerenciarVeiculo(LoginRequiredMixin, ListView):
     """
     View baseada em classe para listar todos os veículos cadastrados.
     
@@ -44,8 +43,7 @@ class GerenciarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, ListView):
         
         return context
     
-class CriarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
-    permission_required = 'veiculos.add_veiculo'
+class CriarVeiculo(LoginRequiredMixin, CreateView):
     """
     View baseada em classe para criação de novos veículos.
     
@@ -70,8 +68,7 @@ class CriarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
     
-class EditarVeiculo(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
-    permission_required = 'veiculos.change_veiculo'
+class EditarVeiculo(LoginRequiredMixin, UpdateView):
     """
     View baseada em classe para edição de veículos existentes.
     
